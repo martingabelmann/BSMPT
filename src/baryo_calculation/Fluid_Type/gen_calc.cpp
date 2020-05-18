@@ -22,88 +22,111 @@
 /**
  * @file
  */
-namespace BSMPT{
-namespace Baryo{
-
-std::pair<std::vector<double> , std::vector<double>> set_up_nL_grid(
-    size_t n_step,
-    GSL_integration_mubl& container, 
-    boost::any const  & classpointer)
+namespace BSMPT
 {
-    bool debug = false;
-    std::vector<double> arr_z;
-    std::vector<double> arr_nL;
+    namespace Baryo
+    {
 
-    arr_z.resize(n_step);
-    arr_nL.resize(n_step);
-    double wall_factor = container.getZMAX();
-    double zstart   =   container.getZMAX();
-    if(container.get_transport_method()==1)
-    {
-        auto C_class = boost::any_cast<top_source>(&classpointer);
-        if(not C_class) 
+        std::pair<std::vector<double>, std::vector<double>> set_up_nL_grid(
+            size_t n_step,
+            GSL_integration_mubl &container,
+            boost::any const &classpointer)
         {
-            std::string errmsg = "boost::any_cast failed @ setting to top_source\n";
-            throw std::runtime_error(errmsg);
-        }
-        for(size_t i=0;i<=n_step;i++)
-        {
-            double zend     =   i*wall_factor/n_step;
-            arr_z[i]        =   zend;
-            arr_nL[i]       =   C_class->Calc_nL(zstart , zend);
-            if(debug)
-            { 
-                std::cout<<"Start of nL_Grid set-up\n";
-                std::cout<<" \tz = "<<arr_z[i]<<std::endl;
-                std::cout<<" \tnL= "<<arr_nL[i]<<std::endl;
-            }
-        }
-    }    
-    if(container.get_transport_method()==2)
-    {
-        auto C_class = boost::any_cast<bot_source>(&classpointer);
-        if(not C_class) 
-            {
-                std::string errmsg = "boost::any_cast failed @ setting to bot_source\n";
-                throw std::runtime_error(errmsg);
-            }
-        for(size_t i=0;i<=n_step;i++)
-        {
-            double zend     =   i*wall_factor/n_step;
-            arr_z[i]        =   zend;
-            arr_nL[i]       =   C_class->Calc_nL(zstart , zend);
-            if(debug)
-            { 
-                std::cout<<"Start of nL_Grid set-up\n";
-                std::cout<<" \tz = "<<arr_z[i]<<std::endl;
-                std::cout<<" \tnL= "<<arr_nL[i]<<std::endl;
-            }
-        }
-    }
-    if(container.get_transport_method()==3)
-    {
-        auto C_class = boost::any_cast<tau_source>(&classpointer);
-        if(not C_class) 
-            {
-                std::string errmsg = "boost::any_cast failed @ setting to tau_source\n";
-                throw std::runtime_error(errmsg);
-            }
-        for(size_t i=0;i<=n_step;i++)
-        {
-            double zend     =   i*wall_factor/n_step;
-            arr_z[i]        =   zend;
-            arr_nL[i]       =   C_class->Calc_nL(zstart , zend);
-            if(debug)
-            { 
-                std::cout<<"Start of nL_Grid set-up\n";
-                std::cout<<" \tz = "<<arr_z[i]<<std::endl;
-                std::cout<<" \tnL= "<<arr_nL[i]<<std::endl;
-            }
-        }
-    }
-    std::pair<std::vector<double> , std::vector<double>>  res  = std::make_pair(arr_z,arr_nL);
-    return res;
-}
+            bool debug = false;
+            std::vector<double> arr_z;
+            std::vector<double> arr_nL;
 
-}
-}
+            arr_z.resize(n_step);
+            arr_nL.resize(n_step);
+            double wall_factor = container.getZMAX();
+            double zstart = container.getZMAX();
+            if (container.get_transport_method() == 1)
+            {
+                auto C_class = boost::any_cast<top_source>(&classpointer);
+                if (not C_class)
+                {
+                    std::string errmsg = "boost::any_cast failed @ setting to top_source\n";
+                    throw std::runtime_error(errmsg);
+                }
+                for (size_t i = 0; i <= n_step; i++)
+                {
+                    double zend = i * wall_factor / n_step;
+                    arr_z[i] = zend;
+                    arr_nL[i] = C_class->Calc_nL(zstart, zend);
+                    if (debug)
+                    {
+                        std::cout << "Start of nL_Grid set-up\n";
+                        std::cout << " \tz = " << arr_z[i] << std::endl;
+                        std::cout << " \tnL= " << arr_nL[i] << std::endl;
+                    }
+                }
+            }
+            if (container.get_transport_method() == 2)
+            {
+                auto C_class = boost::any_cast<bot_source>(&classpointer);
+                if (not C_class)
+                {
+                    std::string errmsg = "boost::any_cast failed @ setting to bot_source\n";
+                    throw std::runtime_error(errmsg);
+                }
+                for (size_t i = 0; i <= n_step; i++)
+                {
+                    double zend = i * wall_factor / n_step;
+                    arr_z[i] = zend;
+                    arr_nL[i] = C_class->Calc_nL(zstart, zend);
+                    if (debug)
+                    {
+                        std::cout << "Start of nL_Grid set-up\n";
+                        std::cout << " \tz = " << arr_z[i] << std::endl;
+                        std::cout << " \tnL= " << arr_nL[i] << std::endl;
+                    }
+                }
+            }
+            if (container.get_transport_method() == 3)
+            {
+                auto C_class = boost::any_cast<tau_source>(&classpointer);
+                if (not C_class)
+                {
+                    std::string errmsg = "boost::any_cast failed @ setting to tau_source\n";
+                    throw std::runtime_error(errmsg);
+                }
+                for (size_t i = 0; i <= n_step; i++)
+                {
+                    double zend = i * wall_factor / n_step;
+                    arr_z[i] = zend;
+                    arr_nL[i] = C_class->Calc_nL(zstart, zend);
+                    if (debug)
+                    {
+                        std::cout << "Start of nL_Grid set-up\n";
+                        std::cout << " \tz = " << arr_z[i] << std::endl;
+                        std::cout << " \tnL= " << arr_nL[i] << std::endl;
+                    }
+                }
+            }
+            if (container.get_transport_method() == 4)
+            {
+                auto C_class = boost::any_cast<BA_template>(&classpointer);
+                if (not C_class)
+                {
+                    std::string errmsg = "boost::any_cast failed @ setting to BA_template\n";
+                    throw std::runtime_error(errmsg);
+                }
+                for (size_t i = 0; i <= n_step; i++)
+                {
+                    double zend = i * wall_factor / n_step;
+                    arr_z[i] = zend;
+                    arr_nL[i] = C_class->Calc_nL(zstart, zend);
+                    if (debug)
+                    {
+                        std::cout << "Start of nL_Grid set-up\n";
+                        std::cout << " \tz = " << arr_z[i] << std::endl;
+                        std::cout << " \tnL= " << arr_nL[i] << std::endl;
+                    }
+                }
+            }
+            std::pair<std::vector<double>, std::vector<double>> res = std::make_pair(arr_z, arr_nL);
+            return res;
+        }
+
+    } // namespace Baryo
+} // namespace BSMPT

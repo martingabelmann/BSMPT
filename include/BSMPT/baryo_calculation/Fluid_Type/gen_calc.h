@@ -37,6 +37,7 @@
 #include <BSMPT/baryo_calculation/Fluid_Type/top_source.h>
 #include <BSMPT/baryo_calculation/Fluid_Type/bot_source.h>
 #include <BSMPT/baryo_calculation/Fluid_Type/tau_source.h>
+#include <BSMPT/baryo_calculation/Fluid_Type/BA_template.h>
 
 namespace BSMPT{
 namespace Baryo{
