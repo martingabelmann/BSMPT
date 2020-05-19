@@ -176,7 +176,7 @@ try
 				//Call: Calculation of eta in the different implemented approaches
 				if (TerminalOutput)
 					std::cout << "Calling CalcEta..." << std::endl;
-				eta = EtaInterface.CalcEta(vw, vcritical, vevsymmetricSolution, TC, modelPointer);
+				eta = EtaInterface.CalcEta(vw, vcritical, vevsymmetricSolution, TC, modelPointer); 
 				//Outfile
 				outfile << linestr;
 				for (auto x : modelPointer->get_parCTStored())
