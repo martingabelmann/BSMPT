@@ -157,7 +157,7 @@ try
 				std::cout << "Calling PTFinder" << std::endl;
 
 			//Call: BSMPT
-			auto EWPT = Minimizer::PTFinder_gen_all(modelPointer, 0, 300,1);//TODO: CHANGE BACK TO PROPER OPTIONS
+			auto EWPT = Minimizer::PTFinder_gen_all(modelPointer, 0, 300,3);//TODO: CHANGE BACK TO PROPER OPTIONS
 			//Define parameters for eta
 			std::vector<double> eta;
 			if (EWPT.StatusFlag == Minimizer::MinimizerStatus::SUCCESS and C_PT * EWPT.Tc < EWPT.vc)

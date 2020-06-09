@@ -1,23 +1,23 @@
 ### config file for the EWBG calculation (yes/no)
 
 Fluid Ansatz only including the top quark in the transport equations
-Include:    no
+Include:    yes
 
 Fluid Ansatz including the top and bottom quark in the transport equations
-Include:    no
+Include:    yes
 
 Fluid Ansatz including the top and bottom quark and the tau lepton in the transport equations
-Include:    no
+Include:    yes
 
 FH Ansatz with the plasma velocities
-Include:    no
+Include:    yes
 
 FH Ansatz with the plasma velocities replaced through the second derivatives
 Include:    no
 
 Treat the bottom quark massive in the Fluid Ansätze
-Massive:    no
+Massive:    yes
 
 Template Ansatz 
-Include:    yes
+Include:    no
 
