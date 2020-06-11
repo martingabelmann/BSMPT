@@ -163,8 +163,6 @@ namespace BSMPT
 			std::stringstream ss(linestr);
 			double tmp;
 
-			double temp_muHsqr, temp_LamH, temp_muSsqr, temp_LamS, temp_LamHS, temp_mXsq;
-
 			if (UseIndexCol)
 			{
 				ss >> tmp;
@@ -174,28 +172,24 @@ namespace BSMPT
 			{
 				ss >> tmp;
 				if (k == 1)
-					temp_muHsqr = tmp;
+					par[0] = tmp; //muHsqr
 				else if (k == 2)
-					temp_LamH = tmp;
-				else if (k==3)
-					temp_muSsqr = tmp;
-				else if (k==4)
-					temp_LamS = tmp;
-				else if (k==5)
-					temp_LamHS = tmp; 
-				else if (k==6)
-					temp_mXsq = tmp; 
+					par[1] = tmp; // LamH
+				else if (k == 3)
+					par[2] = tmp; //muSsqr
+				else if (k == 4)
+					par[3] = tmp; //LamS
+				else if (k == 5)
+					par[4] = tmp; //LamHS
+				else if (k == 6)
+					par[5] = tmp; //mXsqr
+				else if (k == 7)
+					par[6] = tmp; //vh
+				else if (k == 8)
+					par[7] = tmp; //vs
 			}
-			par[0] = muHsqr;
-			par[1] = LamH;
-			par[2] = muSsqr;
-			par[3] = LamS;
-			par[4] = LamHS;
-			par[5] = mXsq;
-			par[6] = vh;
-			par[7] = vs;
 
-			set_gen(par); 
+			set_gen(par);
 			return;
 		}
 
@@ -205,12 +199,14 @@ namespace BSMPT
 		void Class_PNGDM::set_gen(const std::vector<double> &par)
 		{
 
-			ms = par[0];
-			lambda = par[1];
-
-			g = C_g;
-
-			yt = std::sqrt(2) / C_vev0 * C_MassTop;
+			muHsqr = par[0];
+			LamH = par[1];
+			muSsqr = par[2];
+			LamS = par[3];
+			LamHS = par[4];
+			mXsq = par[5];
+			vh = par[6];
+			vs = par[7];
 
 			scale = C_vev0;
 
@@ -218,7 +214,8 @@ namespace BSMPT
 			vevTree.resize(NHiggs);
 
 			// Here you have to set the vector vevTreeMin. The vector vevTree will then be set by the function MinimizeOrderVEV
-			vevTreeMin[0] = C_vev0;
+			vevTreeMin[0] = vh;
+			vevTreeMin[1] = vs;
 
 			vevTree = MinimizeOrderVEV(vevTreeMin);
 			if (!SetCurvatureDone)
@@ -232,13 +229,131 @@ namespace BSMPT
 		void Class_PNGDM::set_CT_Pot_Par(const std::vector<double> &par)
 		{
 
-			dT = par[0];
-			dlambda = par[1];
-			dms = par[2];
+			/*
+		 	parCT[0]=CTmXsqr 
+			parCT[1]=CTmuSsqr
+			parCT[2]=CTLamS
+			parCT[3]=CTmuHsqr
+			parCT[4]=CTLamHS
+			parCT[5]=CTLamH
+			parCT[6]=dTh
+			parCT[7]=dTs
+			*/
+			CTmXsqr = par[0];
+			CTmuSsqr = par[1];
+			CTLamS = par[2];
+			CTmuHsq = par[3];
+			CTLamHS = par[4];
+			CTLamH = par[5];
+			dTh = par[6];
+			dTs = par[7];
 
-			Curvature_Higgs_CT_L1[0] = dT;
-			Curvature_Higgs_CT_L2[0][0] = dms;
-			Curvature_Higgs_CT_L4[0][0][0][0] = dlambda;
+			Curvature_Higgs_CT_L1[4] = dTh;
+			Curvature_Higgs_CT_L1[5] = dTs;
+			Curvature_Higgs_CT_L2[0][0] = -CTmuHsq / 2.;
+			Curvature_Higgs_CT_L2[1][1] = -CTmuHsq / 2.;
+			Curvature_Higgs_CT_L2[2][2] = -CTmuHsq / 2.;
+			Curvature_Higgs_CT_L2[3][3] = -CTmuSsqr / 2. + CTmXsqr / 2.;
+			Curvature_Higgs_CT_L2[4][4] = -CTmuHsq / 2.;
+			Curvature_Higgs_CT_L2[5][5] = -CTmuSsqr / 2. - CTmXsqr / 2.;
+			Curvature_Higgs_CT_L4[0][0][0][0] = 3 * CTLamH;
+
+			Curvature_Higgs_CT_L4[1][1][0][0] = CTLamH;
+			Curvature_Higgs_CT_L4[2][2][0][0] = CTLamH;
+			Curvature_Higgs_CT_L4[3][3][0][0] = CTLamHS;
+			Curvature_Higgs_CT_L4[4][4][0][0] = CTLamH;
+			Curvature_Higgs_CT_L4[5][5][0][0] = CTLamHS;
+			Curvature_Higgs_CT_L4[1][0][1][0] = CTLamH;
+			Curvature_Higgs_CT_L4[0][1][1][0] = CTLamH;
+			Curvature_Higgs_CT_L4[2][0][2][0] = CTLamH;
+			Curvature_Higgs_CT_L4[0][2][2][0] = CTLamH;
+			Curvature_Higgs_CT_L4[3][0][3][0] = CTLamHS;
+			Curvature_Higgs_CT_L4[0][3][3][0] = CTLamHS;
+			Curvature_Higgs_CT_L4[4][0][4][0] = CTLamH;
+			Curvature_Higgs_CT_L4[0][4][4][0] = CTLamH;
+			Curvature_Higgs_CT_L4[5][0][5][0] = CTLamHS;
+			Curvature_Higgs_CT_L4[0][5][5][0] = CTLamHS;
+			Curvature_Higgs_CT_L4[1][0][0][1] = CTLamH;
+			Curvature_Higgs_CT_L4[0][1][0][1] = CTLamH;
+			Curvature_Higgs_CT_L4[0][0][1][1] = CTLamH;
+			Curvature_Higgs_CT_L4[1][1][1][1] = 3 * CTLamH;
+			Curvature_Higgs_CT_L4[2][2][1][1] = CTLamH;
+			Curvature_Higgs_CT_L4[3][3][1][1] = CTLamHS;
+			Curvature_Higgs_CT_L4[4][4][1][1] = CTLamH;
+			Curvature_Higgs_CT_L4[5][5][1][1] = CTLamHS;
+			Curvature_Higgs_CT_L4[2][1][2][1] = CTLamH;
+			Curvature_Higgs_CT_L4[1][2][2][1] = CTLamH;
+			Curvature_Higgs_CT_L4[3][1][3][1] = CTLamHS;
+			Curvature_Higgs_CT_L4[1][3][3][1] = CTLamHS;
+			Curvature_Higgs_CT_L4[4][1][4][1] = CTLamH;
+			Curvature_Higgs_CT_L4[1][4][4][1] = CTLamH;
+			Curvature_Higgs_CT_L4[5][1][5][1] = CTLamHS;
+			Curvature_Higgs_CT_L4[1][5][5][1] = CTLamHS;
+			Curvature_Higgs_CT_L4[2][0][0][2] = CTLamH;
+			Curvature_Higgs_CT_L4[0][2][0][2] = CTLamH;
+			Curvature_Higgs_CT_L4[2][1][1][2] = CTLamH;
+			Curvature_Higgs_CT_L4[1][2][1][2] = CTLamH;
+			Curvature_Higgs_CT_L4[0][0][2][2] = CTLamH;
+			Curvature_Higgs_CT_L4[1][1][2][2] = CTLamH;
+			Curvature_Higgs_CT_L4[2][2][2][2] = 3 * CTLamH;
+			Curvature_Higgs_CT_L4[3][3][2][2] = CTLamHS;
+			Curvature_Higgs_CT_L4[4][4][2][2] = CTLamH;
+			Curvature_Higgs_CT_L4[5][5][2][2] = CTLamHS;
+			Curvature_Higgs_CT_L4[3][2][3][2] = CTLamHS;
+			Curvature_Higgs_CT_L4[2][3][3][2] = CTLamHS;
+			Curvature_Higgs_CT_L4[4][2][4][2] = CTLamH;
+			Curvature_Higgs_CT_L4[2][4][4][2] = CTLamH;
+			Curvature_Higgs_CT_L4[5][2][5][2] = CTLamHS;
+			Curvature_Higgs_CT_L4[2][5][5][2] = CTLamHS;
+			Curvature_Higgs_CT_L4[3][0][0][3] = CTLamHS;
+			Curvature_Higgs_CT_L4[0][3][0][3] = CTLamHS;
+			Curvature_Higgs_CT_L4[3][1][1][3] = CTLamHS;
+			Curvature_Higgs_CT_L4[1][3][1][3] = CTLamHS;
+			Curvature_Higgs_CT_L4[3][2][2][3] = CTLamHS;
+			Curvature_Higgs_CT_L4[2][3][2][3] = CTLamHS;
+			Curvature_Higgs_CT_L4[0][0][3][3] = CTLamHS;
+			Curvature_Higgs_CT_L4[1][1][3][3] = CTLamHS;
+			Curvature_Higgs_CT_L4[2][2][3][3] = CTLamHS;
+			Curvature_Higgs_CT_L4[3][3][3][3] = 3 * CTLamS;
+			Curvature_Higgs_CT_L4[4][4][3][3] = CTLamHS;
+			Curvature_Higgs_CT_L4[5][5][3][3] = CTLamS;
+			Curvature_Higgs_CT_L4[4][3][4][3] = CTLamHS;
+			Curvature_Higgs_CT_L4[3][4][4][3] = CTLamHS;
+			Curvature_Higgs_CT_L4[5][3][5][3] = CTLamS;
+			Curvature_Higgs_CT_L4[3][5][5][3] = CTLamS;
+			Curvature_Higgs_CT_L4[4][0][0][4] = CTLamH;
+			Curvature_Higgs_CT_L4[0][4][0][4] = CTLamH;
+			Curvature_Higgs_CT_L4[4][1][1][4] = CTLamH;
+			Curvature_Higgs_CT_L4[1][4][1][4] = CTLamH;
+			Curvature_Higgs_CT_L4[4][2][2][4] = CTLamH;
+			Curvature_Higgs_CT_L4[2][4][2][4] = CTLamH;
+			Curvature_Higgs_CT_L4[4][3][3][4] = CTLamHS;
+			Curvature_Higgs_CT_L4[3][4][3][4] = CTLamHS;
+			Curvature_Higgs_CT_L4[0][0][4][4] = CTLamH;
+			Curvature_Higgs_CT_L4[1][1][4][4] = CTLamH;
+			Curvature_Higgs_CT_L4[2][2][4][4] = CTLamH;
+			Curvature_Higgs_CT_L4[3][3][4][4] = CTLamHS;
+			Curvature_Higgs_CT_L4[4][4][4][4] = 3 * CTLamH;
+			Curvature_Higgs_CT_L4[5][5][4][4] = CTLamHS;
+			Curvature_Higgs_CT_L4[5][4][5][4] = CTLamHS;
+			Curvature_Higgs_CT_L4[4][5][5][4] = CTLamHS;
+			Curvature_Higgs_CT_L4[5][0][0][5] = CTLamHS;
+			Curvature_Higgs_CT_L4[0][5][0][5] = CTLamHS;
+			Curvature_Higgs_CT_L4[5][1][1][5] = CTLamHS;
+			Curvature_Higgs_CT_L4[1][5][1][5] = CTLamHS;
+			Curvature_Higgs_CT_L4[5][2][2][5] = CTLamHS;
+			Curvature_Higgs_CT_L4[2][5][2][5] = CTLamHS;
+			Curvature_Higgs_CT_L4[5][3][3][5] = CTLamS;
+			Curvature_Higgs_CT_L4[3][5][3][5] = CTLamS;
+			Curvature_Higgs_CT_L4[5][4][4][5] = CTLamHS;
+			Curvature_Higgs_CT_L4[4][5][4][5] = CTLamHS;
+			Curvature_Higgs_CT_L4[0][0][5][5] = CTLamHS;
+			Curvature_Higgs_CT_L4[1][1][5][5] = CTLamHS;
+			Curvature_Higgs_CT_L4[2][2][5][5] = CTLamHS;
+			Curvature_Higgs_CT_L4[3][3][5][5] = CTLamS;
+			Curvature_Higgs_CT_L4[4][4][5][5] = CTLamHS;
+			Curvature_Higgs_CT_L4[5][5][5][5] = 3 * CTLamS;
+
 		}
 
 		/**
@@ -250,13 +365,17 @@ namespace BSMPT
 			std::cout << "Model = " << Model << std::endl;
 
 			std::cout << "The parameters are : " << std::endl;
-			std::cout << "lambda = " << lambda << std::endl
-					  << "\tm^2 = " << ms << std::endl;
+			std::cout << sep << "muHsqr = " << sep << muHsqr << std::endl;
+			std::cout << sep << "LamH = " << sep << LamH << std::endl;
+			std::cout << sep << "muSsqr = " << sep << muSsqr << std::endl;
+			std::cout << sep << "LamS = " << sep << LamS << std::endl;
+			std::cout << sep << "LamHS = " << sep << LamHS << std::endl;
+			std::cout << sep << "mXsqr = " << sep << mXsq << std::endl;
+			std::cout << sep << "vh = " << sep << vh << std::endl;
+			std::cout << sep << "vs = " << sep << vs << std::endl;
 
 			std::cout << "The counterterm parameters are : " << std::endl;
-			std::cout << "dT = " << dT << std::endl
-					  << "dlambda = " << dlambda << std::endl
-					  << "dm^2 = " << dms << std::endl;
+			//TODO
 
 			std::cout << "The scale is given by mu = " << scale << " GeV " << std::endl;
 		}
@@ -266,7 +385,6 @@ namespace BSMPT
  */
 		std::vector<double> Class_PNGDM::calc_CT() const
 		{
-
 			std::vector<double> parCT;
 
 			if (!SetCurvatureDone)
@@ -294,13 +412,24 @@ namespace BSMPT
 				for (size_t j = 0; j < NHiggs; j++)
 					HesseWeinberg(i, j) = WeinbergHesse.at(j * NHiggs + i);
 			}
-
-			// Here you have to use your formulas for the counterterm scheme
-			double t = 0;
-			parCT.push_back(t);																																 // dT
-			parCT.push_back(3.0 * t / std::pow(C_vev0, 3) + 3.0 / std::pow(C_vev0, 3) * NablaWeinberg(0) - 3.0 / std::pow(C_vev0, 2) * HesseWeinberg(0, 0)); // dlambda
-			parCT.push_back(-3.0 / (2 * std::pow(C_vev0, 2)) * NablaWeinberg(0) + 1.0 / 2.0 * HesseWeinberg(0, 0) - 3.0 * t / (2 * C_vev0));				 // dms
-
+			/*
+		 	parCT[0]=CTmXsqr 
+			parCT[1]=CTmuSsqr
+			parCT[2]=CTLamS
+			parCT[3]=CTmuHsqr
+			parCT[4]=CTLamHS
+			parCT[5]=CTLamH
+			parCT[6]=dTh
+			parCT[7]=dTs
+			*/
+			parCT.push_back(HesseWeinberg(4, 4) - NablaWeinberg[6] / vs);
+			parCT.push_back((vh * HesseWeinberg(5, 6) + vs * (-HesseWeinberg(4, 4) + HesseWeinberg(6, 6)) - 2 * NablaWeinberg[6]) / vs);
+			parCT.push_back((vs * HesseWeinberg(6, 6) - NablaWeinberg(6)) / std::pow(vs, 3));
+			parCT.push_back(-3 * HesseWeinberg(3, 3) + HesseWeinberg(5, 5) + (vs * HesseWeinberg(5, 6)) / vh);
+			parCT.push_back(HesseWeinberg(5, 6) / (vh * vs));
+			parCT.push_back((-HesseWeinberg(3, 3) + HesseWeinberg(5, 5)) / std::pow(vh, 2));
+			parCT.push_back(-(vh * HesseWeinberg(3, 3)) + NablaWeinberg[5]);
+			parCT.push_back(0);
 			return parCT;
 		}
 
@@ -383,10 +512,11 @@ namespace BSMPT
 							{
 								for (size_t n = 0; n < NHiggs; n++)
 								{
-									double RotFac = HiggsRotSort(i, l) * HiggsRotSort(j, m) * HiggsRotSort(k, n);
-									TripleHiggsCorrectionsCWPhysical[i][j][k] += RotFac * GaugeBasis[l][m][n];
-									TripleHiggsCorrectionsTreePhysical[i][j][k] += RotFac * LambdaHiggs_3[l][m][n];
-									TripleHiggsCorrectionsCTPhysical[i][j][k] += RotFac * LambdaHiggs_3_CT[l][m][n];
+									(void) NHiggs;
+									// double RotFac = HiggsRotSort(i, l) * HiggsRotSort(j, m) * HiggsRotSort(k, n);
+									// TripleHiggsCorrectionsCWPhysical[i][j][k] += RotFac * GaugeBasis[l][m][n];
+									// TripleHiggsCorrectionsTreePhysical[i][j][k] += RotFac * LamHiggs_3[l][m][n];
+									// TripleHiggsCorrectionsCTPhysical[i][j][k] += RotFac * LamHiggs_3_CT[l][m][n];
 								}
 							}
 						}
@@ -410,13 +540,304 @@ namespace BSMPT
 			for (size_t i = 0; i < NHiggs; i++)
 				HiggsVev[i] = vevTree[i];
 
-			Curvature_Higgs_L2[0][0] = ms;
-			Curvature_Higgs_L4[0][0][0][0] = lambda;
+			Curvature_Higgs_L2[0][0] = -muHsqr / 2.;
+			Curvature_Higgs_L2[1][1] = -muHsqr / 2.;
+			Curvature_Higgs_L2[2][2] = -muHsqr / 2.;
+			Curvature_Higgs_L2[3][3] = -muSsqr / 2. + mXsq / 2.;
+			Curvature_Higgs_L2[4][4] = -muHsqr / 2.;
+			Curvature_Higgs_L2[5][5] = -muSsqr / 2. - mXsq / 2.;
 
-			Curvature_Gauge_G2H2[0][0][0][0] = 4 * std::pow(g, 2);
+			Curvature_Higgs_L4[0][0][0][0] = 3 * LamH;
+			Curvature_Higgs_L4[0][0][1][1] = LamH;
+			Curvature_Higgs_L4[0][0][2][2] = LamH;
+			Curvature_Higgs_L4[0][0][3][3] = LamHS;
+			Curvature_Higgs_L4[0][0][4][4] = LamH;
+			Curvature_Higgs_L4[0][0][5][5] = LamHS;
+			Curvature_Higgs_L4[0][1][0][1] = LamH;
+			Curvature_Higgs_L4[0][1][1][0] = LamH;
+			Curvature_Higgs_L4[0][2][0][2] = LamH;
+			Curvature_Higgs_L4[0][2][2][0] = LamH;
+			Curvature_Higgs_L4[0][3][0][3] = LamHS;
+			Curvature_Higgs_L4[0][3][3][0] = LamHS;
+			Curvature_Higgs_L4[0][4][0][4] = LamH;
+			Curvature_Higgs_L4[0][4][4][0] = LamH;
+			Curvature_Higgs_L4[0][5][0][5] = LamHS;
+			Curvature_Higgs_L4[0][5][5][0] = LamHS;
+			Curvature_Higgs_L4[1][0][0][1] = LamH;
+			Curvature_Higgs_L4[1][0][1][0] = LamH;
+			Curvature_Higgs_L4[1][1][0][0] = LamH;
+			Curvature_Higgs_L4[1][1][1][1] = 3 * LamH;
+			Curvature_Higgs_L4[1][1][2][2] = LamH;
+			Curvature_Higgs_L4[1][1][3][3] = LamHS;
+			Curvature_Higgs_L4[1][1][4][4] = LamH;
+			Curvature_Higgs_L4[1][1][5][5] = LamHS;
+			Curvature_Higgs_L4[1][2][1][2] = LamH;
+			Curvature_Higgs_L4[1][2][2][1] = LamH;
+			Curvature_Higgs_L4[1][3][1][3] = LamHS;
+			Curvature_Higgs_L4[1][3][3][1] = LamHS;
+			Curvature_Higgs_L4[1][4][1][4] = LamH;
+			Curvature_Higgs_L4[1][4][4][1] = LamH;
+			Curvature_Higgs_L4[1][5][1][5] = LamHS;
+			Curvature_Higgs_L4[1][5][5][1] = LamHS;
+			Curvature_Higgs_L4[2][0][0][2] = LamH;
+			Curvature_Higgs_L4[2][0][2][0] = LamH;
+			Curvature_Higgs_L4[2][1][1][2] = LamH;
+			Curvature_Higgs_L4[2][1][2][1] = LamH;
+			Curvature_Higgs_L4[2][2][0][0] = LamH;
+			Curvature_Higgs_L4[2][2][1][1] = LamH;
+			Curvature_Higgs_L4[2][2][2][2] = 3 * LamH;
+			Curvature_Higgs_L4[2][2][3][3] = LamHS;
+			Curvature_Higgs_L4[2][2][4][4] = LamH;
+			Curvature_Higgs_L4[2][2][5][5] = LamHS;
+			Curvature_Higgs_L4[2][3][2][3] = LamHS;
+			Curvature_Higgs_L4[2][3][3][2] = LamHS;
+			Curvature_Higgs_L4[2][4][2][4] = LamH;
+			Curvature_Higgs_L4[2][4][4][2] = LamH;
+			Curvature_Higgs_L4[2][5][2][5] = LamHS;
+			Curvature_Higgs_L4[2][5][5][2] = LamHS;
+			Curvature_Higgs_L4[3][0][0][3] = LamHS;
+			Curvature_Higgs_L4[3][0][3][0] = LamHS;
+			Curvature_Higgs_L4[3][1][1][3] = LamHS;
+			Curvature_Higgs_L4[3][1][3][1] = LamHS;
+			Curvature_Higgs_L4[3][2][2][3] = LamHS;
+			Curvature_Higgs_L4[3][2][3][2] = LamHS;
+			Curvature_Higgs_L4[3][3][0][0] = LamHS;
+			Curvature_Higgs_L4[3][3][1][1] = LamHS;
+			Curvature_Higgs_L4[3][3][2][2] = LamHS;
+			Curvature_Higgs_L4[3][3][3][3] = 3 * LamS;
+			Curvature_Higgs_L4[3][3][4][4] = LamHS;
+			Curvature_Higgs_L4[3][3][5][5] = LamS;
+			Curvature_Higgs_L4[3][4][3][4] = LamHS;
+			Curvature_Higgs_L4[3][4][4][3] = LamHS;
+			Curvature_Higgs_L4[3][5][3][5] = LamS;
+			Curvature_Higgs_L4[3][5][5][3] = LamS;
+			Curvature_Higgs_L4[4][0][0][4] = LamH;
+			Curvature_Higgs_L4[4][0][4][0] = LamH;
+			Curvature_Higgs_L4[4][1][1][4] = LamH;
+			Curvature_Higgs_L4[4][1][4][1] = LamH;
+			Curvature_Higgs_L4[4][2][2][4] = LamH;
+			Curvature_Higgs_L4[4][2][4][2] = LamH;
+			Curvature_Higgs_L4[4][3][3][4] = LamHS;
+			Curvature_Higgs_L4[4][3][4][3] = LamHS;
+			Curvature_Higgs_L4[4][4][0][0] = LamH;
+			Curvature_Higgs_L4[4][4][1][1] = LamH;
+			Curvature_Higgs_L4[4][4][2][2] = LamH;
+			Curvature_Higgs_L4[4][4][3][3] = LamHS;
+			Curvature_Higgs_L4[4][4][4][4] = 3 * LamH;
+			Curvature_Higgs_L4[4][4][5][5] = LamHS;
+			Curvature_Higgs_L4[4][5][4][5] = LamHS;
+			Curvature_Higgs_L4[4][5][5][4] = LamHS;
+			Curvature_Higgs_L4[5][0][0][5] = LamHS;
+			Curvature_Higgs_L4[5][0][5][0] = LamHS;
+			Curvature_Higgs_L4[5][1][1][5] = LamHS;
+			Curvature_Higgs_L4[5][1][5][1] = LamHS;
+			Curvature_Higgs_L4[5][2][2][5] = LamHS;
+			Curvature_Higgs_L4[5][2][5][2] = LamHS;
+			Curvature_Higgs_L4[5][3][3][5] = LamS;
+			Curvature_Higgs_L4[5][3][5][3] = LamS;
+			Curvature_Higgs_L4[5][4][4][5] = LamHS;
+			Curvature_Higgs_L4[5][4][5][4] = LamHS;
+			Curvature_Higgs_L4[5][5][0][0] = LamHS;
+			Curvature_Higgs_L4[5][5][1][1] = LamHS;
+			Curvature_Higgs_L4[5][5][2][2] = LamHS;
+			Curvature_Higgs_L4[5][5][3][3] = LamS;
+			Curvature_Higgs_L4[5][5][4][4] = LamHS;
+			Curvature_Higgs_L4[5][5][5][5] = 3 * LamS;
+			/*
+				* Copied from CxSM Model
+			*/
+			Curvature_Gauge_G2H2[0][0][0][0] = C_g * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[0][0][1][1] = C_g * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[0][0][2][2] = C_g * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[0][0][3][3] = C_g * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[0][3][0][3] = C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[0][3][1][2] = C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[0][3][2][1] = C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[0][3][3][0] = C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[1][1][0][0] = C_g * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[1][1][1][1] = C_g * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[1][1][2][2] = C_g * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[1][1][3][3] = C_g * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[1][3][0][2] = C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[1][3][1][3] = -C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[1][3][2][0] = C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[1][3][3][1] = -C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[2][2][0][0] = C_g * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[2][2][1][1] = C_g * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[2][2][2][2] = C_g * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[2][2][3][3] = C_g * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[2][3][0][0] = C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[2][3][1][1] = C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[2][3][2][2] = -C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[2][3][3][3] = -C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[3][0][0][3] = C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[3][0][1][2] = C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[3][0][2][1] = C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[3][0][3][0] = C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[3][1][0][2] = C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[3][1][1][3] = -C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[3][1][2][0] = C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[3][1][3][1] = -C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[3][2][0][0] = C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[3][2][1][1] = C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[3][2][2][2] = -C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[3][2][3][3] = -C_gs * C_g / 0.2e1;
+			Curvature_Gauge_G2H2[3][3][0][0] = C_gs * C_gs / 0.2e1;
+			Curvature_Gauge_G2H2[3][3][1][1] = C_gs * C_gs / 0.2e1;
+			Curvature_Gauge_G2H2[3][3][2][2] = C_gs * C_gs / 0.2e1;
+			Curvature_Gauge_G2H2[3][3][3][3] = C_gs * C_gs / 0.2e1;
 
-			Curvature_Quark_F2H1[1][0][0] = yt;
-			Curvature_Quark_F2H1[0][1][0] = yt;
+			MatrixXcd YIJQc1(NQuarks, NQuarks), YIJQc2(NQuarks, NQuarks), YIJQc2OI(NQuarks, NQuarks), YIJQg0(NQuarks, NQuarks),
+				YIJQg0OI(NQuarks, NQuarks),
+				YIJQh1(NQuarks, NQuarks), YIJQh2(NQuarks, NQuarks), YIJQh3(NQuarks, NQuarks);
+
+			std::complex<double> V11, V12, V13, V21, V22, V23, V31, V32, V33;
+			V11 = C_Vud;
+			V12 = C_Vus;
+			V13 = C_Vub;
+			V21 = C_Vcd;
+			V22 = C_Vcs;
+			V23 = C_Vcb;
+			V31 = C_Vtd;
+			V32 = C_Vts;
+			V33 = C_Vtb;
+
+			std::complex<double> VC11, VC12, VC13, VC21, VC22, VC23, VC31, VC32, VC33;
+			VC11 = std::conj(C_Vud);
+			VC12 = std::conj(C_Vus);
+			VC13 = std::conj(C_Vub);
+			VC21 = std::conj(C_Vcd);
+			VC22 = std::conj(C_Vcs);
+			VC23 = std::conj(C_Vcb);
+			VC31 = std::conj(C_Vtd);
+			VC32 = std::conj(C_Vts);
+			VC33 = std::conj(C_Vtb);
+
+			std::complex<double> II(0, 1);
+
+			Curvature_Lepton_F2H1[0][1][2] = II / vh * C_MassElectron;
+			Curvature_Lepton_F2H1[0][1][3] = 0.1e1 / vh * C_MassElectron;
+			Curvature_Lepton_F2H1[1][0][2] = II / vh * C_MassElectron;
+			Curvature_Lepton_F2H1[1][0][3] = 0.1e1 / vh * C_MassElectron;
+			Curvature_Lepton_F2H1[1][6][0] = 0.1e1 / vh * C_MassElectron;
+			Curvature_Lepton_F2H1[1][6][1] = II / vh * C_MassElectron;
+			Curvature_Lepton_F2H1[2][3][2] = II / vh * C_MassMu;
+			Curvature_Lepton_F2H1[2][3][3] = 0.1e1 / vh * C_MassMu;
+			Curvature_Lepton_F2H1[3][2][2] = II / vh * C_MassMu;
+			Curvature_Lepton_F2H1[3][2][3] = 0.1e1 / vh * C_MassMu;
+			Curvature_Lepton_F2H1[3][7][0] = 0.1e1 / vh * C_MassMu;
+			Curvature_Lepton_F2H1[3][7][1] = II / vh * C_MassMu;
+			Curvature_Lepton_F2H1[4][5][2] = II / vh * C_MassTau;
+			Curvature_Lepton_F2H1[4][5][3] = 0.1e1 / vh * C_MassTau;
+			Curvature_Lepton_F2H1[5][4][2] = II / vh * C_MassTau;
+			Curvature_Lepton_F2H1[5][4][3] = 0.1e1 / vh * C_MassTau;
+			Curvature_Lepton_F2H1[5][8][0] = 0.1e1 / vh * C_MassTau;
+			Curvature_Lepton_F2H1[5][8][1] = II / vh * C_MassTau;
+			Curvature_Lepton_F2H1[6][1][0] = 0.1e1 / vh * C_MassElectron;
+			Curvature_Lepton_F2H1[6][1][1] = II / vh * C_MassElectron;
+			Curvature_Lepton_F2H1[7][3][0] = 0.1e1 / vh * C_MassMu;
+			Curvature_Lepton_F2H1[7][3][1] = II / vh * C_MassMu;
+			Curvature_Lepton_F2H1[8][5][0] = 0.1e1 / vh * C_MassTau;
+			Curvature_Lepton_F2H1[8][5][1] = II / vh * C_MassTau;
+
+			Curvature_Quark_F2H1[0][6][2] = -II / vh * C_MassUp;
+			Curvature_Quark_F2H1[0][6][3] = 0.1e1 / vh * C_MassUp;
+			Curvature_Quark_F2H1[0][9][0] = -0.1e1 / vh * C_MassUp * conj(V11);
+			Curvature_Quark_F2H1[0][9][1] = II / vh * C_MassUp * conj(V11);
+			Curvature_Quark_F2H1[0][10][0] = -0.1e1 / vh * C_MassUp * conj(V12);
+			Curvature_Quark_F2H1[0][10][1] = II / vh * C_MassUp * conj(V12);
+			Curvature_Quark_F2H1[0][11][0] = -0.1e1 / vh * C_MassUp * conj(V13);
+			Curvature_Quark_F2H1[0][11][1] = II / vh * C_MassUp * conj(V13);
+			Curvature_Quark_F2H1[1][7][2] = -II / vh * C_MassCharm;
+			Curvature_Quark_F2H1[1][7][3] = 0.1e1 / vh * C_MassCharm;
+			Curvature_Quark_F2H1[1][9][0] = -0.1e1 / vh * C_MassCharm * conj(V21);
+			Curvature_Quark_F2H1[1][9][1] = II / vh * C_MassCharm * conj(V21);
+			Curvature_Quark_F2H1[1][10][0] = -0.1e1 / vh * C_MassCharm * conj(V22);
+			Curvature_Quark_F2H1[1][10][1] = II / vh * C_MassCharm * conj(V22);
+			Curvature_Quark_F2H1[1][11][0] = -0.1e1 / vh * C_MassCharm * conj(V23);
+			Curvature_Quark_F2H1[1][11][1] = II / vh * C_MassCharm * conj(V23);
+			Curvature_Quark_F2H1[2][8][2] = -II / vh * C_MassTop;
+			Curvature_Quark_F2H1[2][8][3] = 0.1e1 / vh * C_MassTop;
+			Curvature_Quark_F2H1[2][9][0] = -0.1e1 / vh * C_MassTop * conj(V31);
+			Curvature_Quark_F2H1[2][9][1] = II / vh * C_MassTop * conj(V31);
+			Curvature_Quark_F2H1[2][10][0] = -0.1e1 / vh * C_MassTop * conj(V32);
+			Curvature_Quark_F2H1[2][10][1] = II / vh * C_MassTop * conj(V32);
+			Curvature_Quark_F2H1[2][11][0] = -0.1e1 / vh * C_MassTop * conj(V33);
+			Curvature_Quark_F2H1[2][11][1] = II / vh * C_MassTop * conj(V33);
+			Curvature_Quark_F2H1[3][6][0] = 0.1e1 / vh * C_MassDown * V11;
+			Curvature_Quark_F2H1[3][6][1] = II / vh * C_MassDown * V11;
+			Curvature_Quark_F2H1[3][7][0] = V21 / vh * C_MassDown;
+			Curvature_Quark_F2H1[3][7][1] = II * V21 / vh * C_MassDown;
+			Curvature_Quark_F2H1[3][8][0] = 0.1e1 / vh * C_MassDown * V31;
+			Curvature_Quark_F2H1[3][8][1] = II / vh * C_MassDown * V31;
+			Curvature_Quark_F2H1[3][9][2] = II / vh * C_MassDown;
+			Curvature_Quark_F2H1[3][9][3] = 0.1e1 / vh * C_MassDown;
+			Curvature_Quark_F2H1[4][6][0] = 0.1e1 / vh * C_MassStrange * V12;
+			Curvature_Quark_F2H1[4][6][1] = II / vh * C_MassStrange * V12;
+			Curvature_Quark_F2H1[4][7][0] = V22 / vh * C_MassStrange;
+			Curvature_Quark_F2H1[4][7][1] = II * V22 / vh * C_MassStrange;
+			Curvature_Quark_F2H1[4][8][0] = 0.1e1 / vh * C_MassStrange * V32;
+			Curvature_Quark_F2H1[4][8][1] = II / vh * C_MassStrange * V32;
+			Curvature_Quark_F2H1[4][10][2] = II / vh * C_MassStrange;
+			Curvature_Quark_F2H1[4][10][3] = 0.1e1 / vh * C_MassStrange;
+			Curvature_Quark_F2H1[5][6][0] = V13 / vh * C_MassBottom;
+			Curvature_Quark_F2H1[5][6][1] = II / vh * C_MassBottom * V13;
+			Curvature_Quark_F2H1[5][7][0] = V23 / vh * C_MassBottom;
+			Curvature_Quark_F2H1[5][7][1] = II / vh * C_MassBottom * V23;
+			Curvature_Quark_F2H1[5][8][0] = V33 / vh * C_MassBottom;
+			Curvature_Quark_F2H1[5][8][1] = II / vh * C_MassBottom * V33;
+			Curvature_Quark_F2H1[5][11][2] = II / vh * C_MassBottom;
+			Curvature_Quark_F2H1[5][11][3] = 0.1e1 / vh * C_MassBottom;
+			Curvature_Quark_F2H1[6][0][2] = -II / vh * C_MassUp;
+			Curvature_Quark_F2H1[6][0][3] = 0.1e1 / vh * C_MassUp;
+			Curvature_Quark_F2H1[6][3][0] = 0.1e1 / vh * C_MassDown * V11;
+			Curvature_Quark_F2H1[6][3][1] = II / vh * C_MassDown * V11;
+			Curvature_Quark_F2H1[6][4][0] = 0.1e1 / vh * C_MassStrange * V12;
+			Curvature_Quark_F2H1[6][4][1] = II / vh * C_MassStrange * V12;
+			Curvature_Quark_F2H1[6][5][0] = V13 / vh * C_MassBottom;
+			Curvature_Quark_F2H1[6][5][1] = II / vh * C_MassBottom * V13;
+			Curvature_Quark_F2H1[7][1][2] = -II / vh * C_MassCharm;
+			Curvature_Quark_F2H1[7][1][3] = 0.1e1 / vh * C_MassCharm;
+			Curvature_Quark_F2H1[7][3][0] = V21 / vh * C_MassDown;
+			Curvature_Quark_F2H1[7][3][1] = II * V21 / vh * C_MassDown;
+			Curvature_Quark_F2H1[7][4][0] = V22 / vh * C_MassStrange;
+			Curvature_Quark_F2H1[7][4][1] = II * V22 / vh * C_MassStrange;
+			Curvature_Quark_F2H1[7][5][0] = V23 / vh * C_MassBottom;
+			Curvature_Quark_F2H1[7][5][1] = II / vh * C_MassBottom * V23;
+			Curvature_Quark_F2H1[8][2][2] = -II / vh * C_MassTop;
+			Curvature_Quark_F2H1[8][2][3] = 0.1e1 / vh * C_MassTop;
+			Curvature_Quark_F2H1[8][3][0] = 0.1e1 / vh * C_MassDown * V31;
+			Curvature_Quark_F2H1[8][3][1] = II / vh * C_MassDown * V31;
+			Curvature_Quark_F2H1[8][4][0] = 0.1e1 / vh * C_MassStrange * V32;
+			Curvature_Quark_F2H1[8][4][1] = II / vh * C_MassStrange * V32;
+			Curvature_Quark_F2H1[8][5][0] = V33 / vh * C_MassBottom;
+			Curvature_Quark_F2H1[8][5][1] = II / vh * C_MassBottom * V33;
+			Curvature_Quark_F2H1[9][0][0] = -0.1e1 / vh * C_MassUp * conj(V11);
+			Curvature_Quark_F2H1[9][0][1] = II / vh * C_MassUp * conj(V11);
+			Curvature_Quark_F2H1[9][1][0] = -0.1e1 / vh * C_MassCharm * conj(V21);
+			Curvature_Quark_F2H1[9][1][1] = II / vh * C_MassCharm * conj(V21);
+			Curvature_Quark_F2H1[9][2][0] = -0.1e1 / vh * C_MassTop * conj(V31);
+			Curvature_Quark_F2H1[9][2][1] = II / vh * C_MassTop * conj(V31);
+			Curvature_Quark_F2H1[9][3][2] = II / vh * C_MassDown;
+			Curvature_Quark_F2H1[9][3][3] = 0.1e1 / vh * C_MassDown;
+			Curvature_Quark_F2H1[10][0][0] = -0.1e1 / vh * C_MassUp * conj(V12);
+			Curvature_Quark_F2H1[10][0][1] = II / vh * C_MassUp * conj(V12);
+			Curvature_Quark_F2H1[10][1][0] = -0.1e1 / vh * C_MassCharm * conj(V22);
+			Curvature_Quark_F2H1[10][1][1] = II / vh * C_MassCharm * conj(V22);
+			Curvature_Quark_F2H1[10][2][0] = -0.1e1 / vh * C_MassTop * conj(V32);
+			Curvature_Quark_F2H1[10][2][1] = II / vh * C_MassTop * conj(V32);
+			Curvature_Quark_F2H1[10][4][2] = II / vh * C_MassStrange;
+			Curvature_Quark_F2H1[10][4][3] = 0.1e1 / vh * C_MassStrange;
+			Curvature_Quark_F2H1[11][0][0] = -0.1e1 / vh * C_MassUp * conj(V13);
+			Curvature_Quark_F2H1[11][0][1] = II / vh * C_MassUp * conj(V13);
+			Curvature_Quark_F2H1[11][1][0] = -0.1e1 / vh * C_MassCharm * conj(V23);
+			Curvature_Quark_F2H1[11][1][1] = II / vh * C_MassCharm * conj(V23);
+			Curvature_Quark_F2H1[11][2][0] = -0.1e1 / vh * C_MassTop * conj(V33);
+			Curvature_Quark_F2H1[11][2][1] = II / vh * C_MassTop * conj(V33);
+			Curvature_Quark_F2H1[11][5][2] = II / vh * C_MassBottom;
+			Curvature_Quark_F2H1[11][5][3] = 0.1e1 / vh * C_MassBottom;
+
+			SetCurvatureDone = true;
 		}
 
 		bool Class_PNGDM::CalculateDebyeSimplified()
@@ -439,23 +860,19 @@ namespace BSMPT
 		}
 		double Class_PNGDM::VTreeSimplified(const std::vector<double> &v) const
 		{
+			(void) v;
 			if (not UseVTreeSimplified)
 				return 0;
 			double res = 0;
-
-			double vIn = v[0];
-			res = 0.5 * ms * std::pow(vIn, 2) + 1.0 / 24.0 * lambda * std::pow(vIn, 4);
-
 			return res;
 		}
 
 		double Class_PNGDM::VCounterSimplified(const std::vector<double> &v) const
 		{
+			(void) v;
 			if (not UseVCounterSimplified)
 				return 0;
 			double res = 0;
-			double vIn = v[0];
-			res = 0.5 * dms * std::pow(vIn, 2) + 1.0 / 24.0 * dlambda * std::pow(vIn, 4) + dT * vIn;
 			return res;
 		}
 
