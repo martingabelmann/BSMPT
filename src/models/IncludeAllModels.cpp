@@ -28,6 +28,8 @@
 #include <BSMPT/models/ClassPotentialRN2HDM.h>
 #include <BSMPT/models/ClassPotentialCxSM.h>
 
+#include <BSMPT/models/ClassPotentialPNGDM.h>
+
 #include <BSMPT/models/ClassTemplate.h>
 
 
@@ -44,6 +46,7 @@ std::unique_ptr<Class_Potential_Origin> FChoose(ModelIDs choice){
     case ModelIDs::RN2HDM: return  std::make_unique<Class_Potential_RN2HDM>(); break;
     case ModelIDs::CXSM: return std::make_unique<Class_CxSM>(); break;
     case ModelIDs::TEMPLATE: return std::unique_ptr<Class_Template>(); break;
+    case ModelIDs::PNGDM: return std::unique_ptr<Class_PNGDM>();break;
     default: throw std::runtime_error("Invalid model");
     }
 }
