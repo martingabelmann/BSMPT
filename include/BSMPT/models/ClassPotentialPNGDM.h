@@ -40,7 +40,8 @@ namespace BSMPT
     {
     public:
       Class_PNGDM();
-      virtual ~Class_PNGDM();
+      virtual
+       ~Class_PNGDM();
 
       double muHsqr, LamH, muSsqr, LamS, LamHS, mXsq;
       double CTmuHsq, CTLamH, CTmuSsqr, CTLamS, CTLamHS, CTmXsqr, dTh, dTs;

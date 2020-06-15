@@ -52,7 +52,7 @@ namespace BSMPT
 			NNeutralHiggs = 4;				  // number of neutral Higgs bosons at T = 0
 			NChargedHiggs = 2;				  // number of charged Higgs bosons  at T = 0 (all d.o.f.)
 
-			nPar = 6;	// number of parameters in the tree-Level Lagrangian
+			nPar = 8;	// number of parameters in the tree-Level Lagrangian
 			nParCT = 8; // number of parameters in the counterterm potential
 
 			nVEV = 2; // number of VEVs to minimize the potential
@@ -168,27 +168,26 @@ namespace BSMPT
 				ss >> tmp;
 			}
 
-			for (int k = 1; k <= 8; k++)
+			for (int k = 1; k <= 12; k++)
 			{
+				// to Tizian's convention: {lambda, d2, delta2} --> {2lH, 2lS, 2lHS}
+				// msq = -muH^2 in Tizian's convention
+				// b2 = -muS^2 in Tizian's convention
 				ss >> tmp;
-				if (k == 1)
-					par[0] = tmp; //muHsqr
-				else if (k == 2)
-					par[1] = tmp; // LamH
-				else if (k == 3)
-					par[2] = tmp; //muSsqr
-				else if (k == 4)
-					par[3] = tmp; //LamS
-				else if (k == 5)
-					par[4] = tmp; //LamHS
-				else if (k == 6)
-					par[5] = tmp; //mXsqr
-				else if (k == 7)
-					par[6] = tmp; //vh
-				else if (k == 8)
-					par[7] = tmp; //vs
-			}
+				// if(k==1) std::cout<<tmp<<std::endl; //mh1
+				// else if(k==2) std::cout<<tmp<<std::endl; //mh2
+				if(k==3) par[6]=tmp;//v
+				else if(k==4) par[7] = tmp;//vS 
+				else if(k==5) par[5] = tmp;//MXsqr
+				// else if(k==6) continue;//alpha
+				// else if(k==7) continue;//omega-c
+				else if(k==8) par[1] = tmp/2.; //lambda converted to LamH
+				else if(k==9) par[3] = tmp/2.;// d2 converted to LamS
+				else if(k==10) par[4] = tmp/2.;// delta2 converted to LamHS
+				else if(k==11) par[0] = -tmp;//msq converted to muHsq
+				else if(k==12) par[2] = -tmp;//b2 converted to muSsqr
 
+			}
 			set_gen(par);
 			return;
 		}
@@ -534,9 +533,7 @@ namespace BSMPT
    *  Curvature_Quark_F2H1, Curvature_Lepton_F2H1
    *  as described in the potential in the paper.
    */
-
 			initVectors();
-			SetCurvatureDone = true;
 			for (size_t i = 0; i < NHiggs; i++)
 				HiggsVev[i] = vevTree[i];
 
@@ -838,6 +835,7 @@ namespace BSMPT
 			Curvature_Quark_F2H1[11][5][3] = 0.1e1 / vh * C_MassBottom;
 
 			SetCurvatureDone = true;
+
 		}
 
 		bool Class_PNGDM::CalculateDebyeSimplified()

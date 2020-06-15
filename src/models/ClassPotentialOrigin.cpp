@@ -2788,7 +2788,6 @@ std::pair<std::vector<double>, std::vector<double>> Class_Potential_Origin::init
 	resetbools();
 	ReadAndSet(linestr,par);
     parCT=initModel(par);
-
 	parStored=par;
 	parCTStored=parCT;
 

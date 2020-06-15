@@ -61,11 +61,13 @@ int main(int argc, char *argv[]) try{
 
 
     auto Model=ModelID::getModel(argv[1]);
+
     if(Model==ModelID::ModelIDs::NotSet) {
         std::cerr << "Your Model parameter does not match with the implemented Models." << std::endl;
         ShowInputError();
         return EXIT_FAILURE;
     }
+
 
 	double LineStart,LineEnd;
 	char* in_file;char* out_file;
@@ -117,12 +119,12 @@ int main(int argc, char *argv[]) try{
     size_t nPar,nParCT;
     nPar = modelPointer->get_nPar();
     nParCT = modelPointer->get_nParCT();
-
     size_t ndim = modelPointer->get_nVEV();
 
-	
+
 	std::vector<double> par(nPar);
 	std::vector<double> parCT(nParCT);
+
 
 
 	while(getline(infile,linestr))
