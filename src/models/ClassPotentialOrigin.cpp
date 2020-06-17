@@ -2595,6 +2595,8 @@ void Class_Potential_Origin::CheckImplementation(
             NablaWeinberg[i] = WeinbergNabla[i];
             for(size_t j=0;j<NHiggs;j++) HesseWeinberg(i,j) = WeinbergHesse.at(j*NHiggs+i);
         }
+        
+
 
         for(size_t i=0;i<NHiggs;i++){
             NablaVCT(i) = Curvature_Higgs_CT_L1[i];
@@ -2641,6 +2643,7 @@ void Class_Potential_Origin::CheckImplementation(
         std::cout << "The higgs masses squared at LO | NLO are : " << std::endl;
         for(size_t i=0;i<NHiggs;i++){
             std::cout << "m_i^2 = " << TreeMass[i] << " | " << NLOMass[i] << std::endl;
+            std::cout << "m_i = " << std::sqrt(std::abs(TreeMass[i])) << " | " << std::sqrt(std::abs(NLOMass[i])) << std::endl;
         }
 
         double sum{0.0};
