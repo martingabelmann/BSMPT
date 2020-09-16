@@ -1,5 +1,5 @@
 /*
- * ClassTemplate.cpp
+ * Class_HighScalePT.cpp
  *
  *  Copyright (C) 2018  Philipp Basler and Margarete Mühlleitner
 
@@ -27,8 +27,10 @@
 #include "Eigen/Eigenvalues"
 #include "Eigen/IterativeLinearSolvers"
 
-#include <BSMPT/models/ClassTemplate.h>
+#include <BSMPT/models/ClassPotentialHighScalePT.h>
+
 #include <BSMPT/models/IncludeAllModels.h>
+
 #include <BSMPT/utility.h>
 using namespace Eigen;
 
@@ -44,7 +46,7 @@ namespace Models{
  *  using the tadpole conditions),
  * nParCT (number of counterterms) as well as nVEV (number of VEVs for minimization)
  */
-Class_Template::Class_Template ()
+Class_HighScalePT::Class_HighScalePT ()
 {
   Model = ModelID::ModelIDs::TEMPLATE; // global int constant which will be used to tell the program which model is called
   NNeutralHiggs = 1; // number of neutral Higgs bosons at T = 0
@@ -69,7 +71,7 @@ Class_Template::Class_Template ()
 
 }
 
-Class_Template::~Class_Template ()
+Class_HighScalePT::~Class_HighScalePT ()
 {
 }
 
@@ -77,7 +79,7 @@ Class_Template::~Class_Template ()
  * returns a string which tells the user the chronological order of the counterterms. Use this to
  * complement the legend of the given input file
  */
-std::vector<std::string> Class_Template::addLegendCT() const{
+std::vector<std::string> Class_HighScalePT::addLegendCT() const{
     std::vector<std::string> labels;
     labels.push_back("dT");
     labels.push_back("dlambda");
@@ -89,7 +91,7 @@ std::vector<std::string> Class_Template::addLegendCT() const{
  * returns a string which tells the user the chronological order of the VEVs and the critical temperature. Use this to
  * complement the legend of the given input file
  */
-std::vector<std::string> Class_Template::addLegendTemp() const{
+std::vector<std::string> Class_HighScalePT::addLegendTemp() const{
     std::vector<std::string> labels;
     labels.push_back("T_c"); // Label for the critical temperature
     labels.push_back("v_c"); // Label for the critical vev
@@ -104,7 +106,7 @@ std::vector<std::string> Class_Template::addLegendTemp() const{
  * complement the legend of the given input file
  *
  */
-std::vector<std::string> Class_Template::addLegendTripleCouplings() const{
+std::vector<std::string> Class_HighScalePT::addLegendTripleCouplings() const{
     std::vector<std::string> labels;
 	std::vector<std::string> particles;
 	particles.resize(NHiggs);
@@ -133,7 +135,7 @@ std::vector<std::string> Class_Template::addLegendTripleCouplings() const{
  * returns a string which tells the user the chronological order of the VEVs. Use this to
  * complement the legend of the given input file
  */
-std::vector<std::string> Class_Template::addLegendVEV() const{
+std::vector<std::string> Class_HighScalePT::addLegendVEV() const{
     std::vector<std::string> labels;
     //out = "Your VEV order";
     labels.push_back("omega");
@@ -143,7 +145,7 @@ std::vector<std::string> Class_Template::addLegendVEV() const{
 /**
  * Reads the string linestr and sets the parameter point
  */
-void Class_Template::ReadAndSet(const std::string& linestr, std::vector<double>& par )
+void Class_HighScalePT::ReadAndSet(const std::string& linestr, std::vector<double>& par )
 {
 	std::stringstream ss(linestr);
 	double tmp;
@@ -173,7 +175,7 @@ void Class_Template::ReadAndSet(const std::string& linestr, std::vector<double>&
 /**
  * Set Class Object as well as the VEV configuration
  */
-void Class_Template::set_gen(const std::vector<double>& par) {
+void Class_HighScalePT::set_gen(const std::vector<double>& par) {
     ms = par[0]; // Class member is set accordingly to the input parameters
     lambda = par[1]; // Class member is set accordingly to the input parameters
     g=C_g; // SM SU (2) gauge coupling --> SMparam .h
@@ -191,7 +193,7 @@ void Class_Template::set_gen(const std::vector<double>& par) {
  * set your counterterm parameters from the entries of par as well as the entries of Curvature_Higgs_CT_L1 to
  * Curvature_Higgs_CT_L4.
  */
-void Class_Template::set_CT_Pot_Par(const std::vector<double>& par){
+void Class_HighScalePT::set_CT_Pot_Par(const std::vector<double>& par){
 
 	dT = par[0];
 	dlambda = par[1];
@@ -206,7 +208,7 @@ void Class_Template::set_CT_Pot_Par(const std::vector<double>& par){
 /**
  * console output of all Parameters
  */
-void Class_Template::write() const {
+void Class_HighScalePT::write() const {
 
     std::cout << "Model = " << Model << std::endl;
 
@@ -227,7 +229,7 @@ void Class_Template::write() const {
 /**
  * Calculates the counterterms. Here you need to work out the scheme and implement the formulas.
  */
-std::vector<double> Class_Template::calc_CT() const {
+std::vector<double> Class_HighScalePT::calc_CT() const {
 
     std::vector<double> parCT;
 
@@ -268,7 +270,7 @@ std::vector<double> Class_Template::calc_CT() const {
 
 
 
-void Class_Template::TripleHiggsCouplings()
+void Class_HighScalePT::TripleHiggsCouplings()
 {
 	if(!SetCurvatureDone)SetCurvatureArrays();
 	if(!CalcCouplingsdone)CalculatePhysicalCouplings();
@@ -364,7 +366,7 @@ void Class_Template::TripleHiggsCouplings()
 
 }
 
-void Class_Template::SetCurvatureArrays(){
+void Class_HighScalePT::SetCurvatureArrays(){
   /*
    *  Here you have to set the vectors
    *  Curvature_Higgs_L1,Curvature_Higgs_L2,Curvature_Higgs_L3,Curvature_Higgs_L4
@@ -389,7 +391,7 @@ void Class_Template::SetCurvatureArrays(){
 }
 
 
-bool Class_Template::CalculateDebyeSimplified(){
+bool Class_HighScalePT::CalculateDebyeSimplified(){
   return false;
   /*
    * Use this function if you calculated the Debye corrections to the Higgs mass matrix and implement
@@ -397,7 +399,7 @@ bool Class_Template::CalculateDebyeSimplified(){
    */
 }
 
-bool Class_Template::CalculateDebyeGaugeSimplified()
+bool Class_HighScalePT::CalculateDebyeGaugeSimplified()
 {
   /*
      * Use this function if you calculated the Debye corrections to the gauge mass matrix and implement
@@ -407,7 +409,7 @@ bool Class_Template::CalculateDebyeGaugeSimplified()
 
   return false;
 }
-double Class_Template::VTreeSimplified(const std::vector<double>& v) const {
+double Class_HighScalePT::VTreeSimplified(const std::vector<double>& v) const {
     if(not UseVTreeSimplified) return  0;
 	double res = 0;
 
@@ -417,7 +419,7 @@ double Class_Template::VTreeSimplified(const std::vector<double>& v) const {
 	return res;
 }
 
-double Class_Template::VCounterSimplified(const std::vector<double>& v) const
+double Class_HighScalePT::VCounterSimplified(const std::vector<double>& v) const
 {
     if(not UseVCounterSimplified) return 0;
 	double res = 0;
@@ -426,7 +428,7 @@ double Class_Template::VCounterSimplified(const std::vector<double>& v) const
 	return res;
 }
 
-void Class_Template::Debugging(const std::vector<double>& input, std::vector<double>& output) const
+void Class_HighScalePT::Debugging(const std::vector<double>& input, std::vector<double>& output) const
 {
 	(void) input;
 	(void) output;
