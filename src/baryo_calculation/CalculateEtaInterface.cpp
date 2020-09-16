@@ -31,6 +31,7 @@
 #include <BSMPT/baryo_calculation/Fluid_Type/top_source.h>
 #include <BSMPT/baryo_calculation/Fluid_Type/bot_source.h>
 #include <BSMPT/baryo_calculation/Fluid_Type/tau_source.h>
+#include <BSMPT/baryo_calculation/Fluid_Type/BA_template.h>
 
 namespace BSMPT{
 namespace Baryo{
@@ -96,10 +97,10 @@ std::pair<std::vector<bool>,int> CalculateEtaInterface::ReadConfigFile(const std
 CalculateEtaInterface::CalculateEtaInterface(const std::pair<std::vector<bool>,int>& config)
     : method_transport{config.first}, bot_mass_flag{config.second}
 {
-    if(config.first.size() != 5){
+    if(config.first.size() != 6){
         std::string errmsg = "Warning: ";
         errmsg += __func__;
-        errmsg += " expects a vector of length 5 but only received ";
+        errmsg += " expects a vector of length 6 but only received ";
         errmsg += std::to_string(config.first.size());
         errmsg+= ".";
         throw std::runtime_error(errmsg);
@@ -128,6 +129,7 @@ std::vector<std::string> CalculateEtaInterface::legend() const
 	if(method_transport.at(2)) etaLegend.push_back("eta_TopBotTau");
 	if(method_transport.at(3)) etaLegend.push_back("eta_PlasmaVelocities");
 	if(method_transport.at(4)) etaLegend.push_back("eta_PlasmaVelocitiesReplaced");
+	if(method_transport.at(5)) etaLegend.push_back("eta_template");
 
 	return etaLegend;
 }
@@ -198,6 +200,15 @@ std::vector<double> CalculateEtaInterface::CalcEta()
 	if(method_transport.at(4)){
 		GSL_integration_mubl_container.setUseVelocityTransportEquations(false);
 		eta.push_back(Integrate_mubl_interpolated(GSL_integration_mubl_container));
+	}
+	if(method_transport.at(5)){
+		GSL_integration_mubl_container.set_transport_method(4);
+		BA_template C_template;
+		C_template.set_class(bot_mass_flag, GSL_integration_mubl_container,Calc_Gam_inp,Calc_Scp_inp,Calc_kappa_inp);
+		auto arr_nL = set_up_nL_grid(n_step,GSL_integration_mubl_container,C_template);
+		C_eta.set_class(arr_nL,TC,vw);
+		eta.push_back(Nintegrate_eta(C_eta,0,GSL_integration_mubl_container.getZMAX()));
+
 	}
 	return eta;
 }

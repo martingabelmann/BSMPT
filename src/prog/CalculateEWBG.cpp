@@ -156,8 +156,9 @@ int main(int argc, char *argv[]) try{
                 outfile << sep << EtaInterface.getBrokenCPViolatingPhase_tau();
                 outfile << sep << eta;
 				outfile << std::endl;
-			}//END: SFOEWPT found
-			else{ // No SFOEWPT provided
+			} //END: SFOEWPT found
+			else
+			{ // No SFOEWPT provided
 				outfile << linestr;
                 outfile << sep <<parameters.second;
                 outfile << sep << EWPT.Tc << sep << EWPT.vc;

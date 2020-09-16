@@ -64,8 +64,24 @@ std::pair<std::vector<double> , std::vector<double>> set_up_nL_grid(
         auto C_class = boost::any_cast<bot_source>(&classpointer);
         if(not C_class) 
             {
-                std::string errmsg = "boost::any_cast failed @ setting to bot_source\n";
-                throw std::runtime_error(errmsg);
+                auto C_class = boost::any_cast<top_source>(&classpointer);
+                if (not C_class)
+                {
+                    std::string errmsg = "boost::any_cast failed @ setting to top_source\n";
+                    throw std::runtime_error(errmsg);
+                }
+                for (size_t i = 0; i <= n_step; i++)
+                {
+                    double zend = i * wall_factor / n_step;
+                    arr_z[i] = zend;
+                    arr_nL[i] = C_class->Calc_nL(zstart, zend);
+                    if (debug)
+                    {
+                        std::cout << "Start of nL_Grid set-up\n";
+                        std::cout << " \tz = " << arr_z[i] << std::endl;
+                        std::cout << " \tnL= " << arr_nL[i] << std::endl;
+                    }
+                }
             }
         for(std::size_t i=0;i<=n_step;i++)
         {
@@ -85,8 +101,24 @@ std::pair<std::vector<double> , std::vector<double>> set_up_nL_grid(
         auto C_class = boost::any_cast<tau_source>(&classpointer);
         if(not C_class) 
             {
-                std::string errmsg = "boost::any_cast failed @ setting to tau_source\n";
-                throw std::runtime_error(errmsg);
+                auto C_class = boost::any_cast<tau_source>(&classpointer);
+                if (not C_class)
+                {
+                    std::string errmsg = "boost::any_cast failed @ setting to tau_source\n";
+                    throw std::runtime_error(errmsg);
+                }
+                for (size_t i = 0; i <= n_step; i++)
+                {
+                    double zend = i * wall_factor / n_step;
+                    arr_z[i] = zend;
+                    arr_nL[i] = C_class->Calc_nL(zstart, zend);
+                    if (debug)
+                    {
+                        std::cout << "Start of nL_Grid set-up\n";
+                        std::cout << " \tz = " << arr_z[i] << std::endl;
+                        std::cout << " \tnL= " << arr_nL[i] << std::endl;
+                    }
+                }
             }
         for(std::size_t i=0;i<=n_step;i++)
         {
@@ -99,11 +131,9 @@ std::pair<std::vector<double> , std::vector<double>> set_up_nL_grid(
                 std::cout<<" \tz = "<<arr_z[i]<<std::endl;
                 std::cout<<" \tnL= "<<arr_nL[i]<<std::endl;
             }
+            std::pair<std::vector<double>, std::vector<double>> res = std::make_pair(arr_z, arr_nL);
+            return res;
         }
-    }
-    std::pair<std::vector<double> , std::vector<double>>  res  = std::make_pair(arr_z,arr_nL);
-    return res;
-}
 
-}
-}
+    } // namespace Baryo
+} // namespace BSMPT

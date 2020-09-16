@@ -48,6 +48,7 @@ protected:
 	 * method_transport(2) --> top+bot+tau included in transport equations \n
 	 * method_transport(3) --> Huber Ansatz with plasma velocities \n
 	 * method_transport(4) --> Huber Ansatz with plasma velocities replaced by the second derivatives
+	 * method_transport(5) --> Template for additional transport equations
 	 */
     std::vector<bool> method_transport;
 

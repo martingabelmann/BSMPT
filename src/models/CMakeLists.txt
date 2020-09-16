@@ -27,6 +27,7 @@ set(src
 
   # Here you can add your new model
   ClassTemplate.cpp
+  ClassPotentialPNGDM.cpp
 )
 
 add_library(Models ${header} ${src})
