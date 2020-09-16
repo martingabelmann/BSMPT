@@ -134,6 +134,7 @@ std::pair<std::vector<double> , std::vector<double>> set_up_nL_grid(
             std::pair<std::vector<double>, std::vector<double>> res = std::make_pair(arr_z, arr_nL);
             return res;
         }
-
-    } // namespace Baryo
+    }
+    }
+} // namespace Baryo
 } // namespace BSMPT

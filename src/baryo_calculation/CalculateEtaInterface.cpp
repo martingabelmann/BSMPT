@@ -201,15 +201,15 @@ std::vector<double> CalculateEtaInterface::CalcEta()
 		GSL_integration_mubl_container.setUseVelocityTransportEquations(false);
 		eta.push_back(Integrate_mubl_interpolated(GSL_integration_mubl_container));
 	}
-	if(method_transport.at(5)){
-		GSL_integration_mubl_container.set_transport_method(4);
-		BA_template C_template;
-		C_template.set_class(bot_mass_flag, GSL_integration_mubl_container,Calc_Gam_inp,Calc_Scp_inp,Calc_kappa_inp);
-		auto arr_nL = set_up_nL_grid(n_step,GSL_integration_mubl_container,C_template);
-		C_eta.set_class(arr_nL,TC,vw);
-		eta.push_back(Nintegrate_eta(C_eta,0,GSL_integration_mubl_container.getZMAX()));
+	// if(method_transport.at(5)){
+	// 	GSL_integration_mubl_container.set_transport_method(4);
+	// 	BA_template C_template;
+	// 	C_template.set_class(bot_mass_flag, GSL_integration_mubl_container,Calc_Gam_inp,Calc_Scp_inp,Calc_kappa_inp);
+	// 	auto arr_nL = set_up_nL_grid(n_step,GSL_integration_mubl_container,C_template);
+	// 	C_eta.set_class(arr_nL,TC,vw);
+	// 	eta.push_back(Nintegrate_eta(C_eta,0,GSL_integration_mubl_container.getZMAX()));
 
-	}
+	// }
 	return eta;
 }
 
