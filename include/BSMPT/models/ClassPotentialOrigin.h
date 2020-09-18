@@ -193,8 +193,6 @@ Note to Mac Users: You have to use the g++ compiler as clang does not support Op
  *
  */
 
-
-
 #ifndef CLASSPOTENTIALORIGIN_H_
 #define CLASSPOTENTIALORIGIN_H_
 
@@ -205,48 +203,47 @@ Note to Mac Users: You have to use the g++ compiler as clang does not support Op
 #include <BSMPT/models/IncludeAllModels.h>
 #include <BSMPT/minimizer/Minimizer.h>
 
+namespace BSMPT
+{
 
-namespace BSMPT{
-
-/**
+  /**
  * @brief C_UseParwani Use the Parwani Method instead of Arnold-Espinosa
  */
-const bool C_UseParwani=false;
+  const bool C_UseParwani = false;
 
-/**
+  /**
  * @brief C_PT Lower threshold to stop the EWPT calculation
  */
-const double C_PT = 0;
+  const double C_PT = 0;
 
-/**
+  /**
  * @brief C_threshold threshold to check if a mass is numerically zero
  */
-const double C_threshold = 1e-4;
-/**
+  const double C_threshold = 1e-4;
+  /**
  * @brief C_CWcbFermion constant used in the CW potential for fermions
  */
-static constexpr double C_CWcbFermion = 1.5;
-/**
+  static constexpr double C_CWcbFermion = 1.5;
+  /**
  * @brief C_CWcbGB constant used in the CW potential for gauge bosons
  */
-const double C_CWcbGB = 5.0/6.0;
-/**
+  const double C_CWcbGB = 5.0 / 6.0;
+  /**
  * @brief C_CWcbHiggs constant used in the CW potential for Higgs bosons
  */
-const double C_CWcbHiggs = 1.5;
+  const double C_CWcbHiggs = 1.5;
 
-
-/**
+  /**
  * @brief The Class_Potential_Origin class
  * Base class for all models. This class contains all numerical calculations on the tensors and the inherited classes only have to set them.
  */
-class Class_Potential_Origin
-{
-protected:
+  class Class_Potential_Origin
+  {
+  protected:
     /**
      * @brief UseTreeLevel Enforces VEff to only use the tree-level potential
      */
-    bool UseTreeLevel=false;
+    bool UseTreeLevel = false;
 
     /**
      * MSBar renormalization scale
@@ -260,7 +257,7 @@ protected:
     /**
        * Number of Lagrange parameters in the Higgs Counterterm potential
        */
-    std::size_t nParCT=0;
+    std::size_t nParCT = 0;
 
     /**
    * Vector to store the parameter of the Potential
@@ -287,7 +284,7 @@ protected:
     /**
    * Number of all Higgs particles. This will define the size of your Higgs mass matrix.
    */
-    std::size_t NHiggs = NNeutralHiggs+NChargedHiggs;
+    std::size_t NHiggs = NNeutralHiggs + NChargedHiggs;
     /**
    * Number of gauge bosons. Do not change this in the current version as we only investigate extended Higgs
    * sectors. If you want to extend the other sectors as well the Debye corrections have to be calculated by hand.
@@ -313,9 +310,15 @@ protected:
     std::size_t NLepton = 9;
 
     /**
+     * @brief Number of non-SM like light fermion required for the High Scale Susy matching
+     * 
+     */
+    std::size_t NNonSMFermion = 0;
+
+    /**
    * Number of VEVs you want to minimize.
    */
-    std::size_t nVEV=0;
+    std::size_t nVEV = 0;
 
     /**
      * Storage of the symmetric VEV in all Higgs fields
@@ -338,17 +341,17 @@ protected:
     * Storage of the contributions of the Coleman-Weinberg potential to the triple Higgs couplings in the
     * mass basis
     */
-    std::vector<std::vector<std::vector< double>>> TripleHiggsCorrectionsCWPhysical;
+    std::vector<std::vector<std::vector<double>>> TripleHiggsCorrectionsCWPhysical;
     /**
      * Storage of the contributions of the tree-level potential to the triple Higgs couplings in the
      * mass basis
      */
-    std::vector<std::vector<std::vector< double>>> TripleHiggsCorrectionsTreePhysical;
+    std::vector<std::vector<std::vector<double>>> TripleHiggsCorrectionsTreePhysical;
     /**
       * Storage of the contributions of the counterterm potential to the triple Higgs couplings in the
       * mass basis
       */
-    std::vector<std::vector<std::vector< double>>> TripleHiggsCorrectionsCTPhysical;
+    std::vector<std::vector<std::vector<double>>> TripleHiggsCorrectionsCTPhysical;
 
     /**
      * @brief SetCurvatureDone Used to check if the tensors are set
@@ -366,13 +369,12 @@ protected:
     /**
      * @brief InputLineNumber Used for the error message in fbaseTri
      */
-    int InputLineNumber=-1;
+    int InputLineNumber = -1;
 
     /**
    * Variable to check if the input file has an index column or not
    */
     bool UseIndexCol = false;
-
 
     /**
    * Storage of the Tree-Level Higgs VEV
@@ -385,15 +387,15 @@ protected:
     /**
      * L_{(S)}^{ij}
      */
-    std::vector< std::vector<double> > Curvature_Higgs_L2;
+    std::vector<std::vector<double>> Curvature_Higgs_L2;
     /**
      * L_{(S)}^{ijk}
      */
-    std::vector< std::vector< std::vector<double> > > Curvature_Higgs_L3;
+    std::vector<std::vector<std::vector<double>>> Curvature_Higgs_L3;
     /**
      * L_{(S)}^{ijkl}
      */
-    std::vector< std::vector< std::vector< std::vector<double> > > >Curvature_Higgs_L4;
+    std::vector<std::vector<std::vector<std::vector<double>>>> Curvature_Higgs_L4;
     /**
      * L_{(S),CT}^{i}
      */
@@ -401,27 +403,39 @@ protected:
     /**
         * L_{(S),CT}^{ij}
         */
-    std::vector< std::vector<double> > Curvature_Higgs_CT_L2;
+    std::vector<std::vector<double>> Curvature_Higgs_CT_L2;
     /**
        * L_{(S),CT}^{ijk}
        */
-    std::vector< std::vector< std::vector<double> > > Curvature_Higgs_CT_L3;
+    std::vector<std::vector<std::vector<double>>> Curvature_Higgs_CT_L3;
     /**
        * L_{(S),CT}^{ijkl}
        */
-    std::vector< std::vector< std::vector< std::vector<double> > > >Curvature_Higgs_CT_L4;
+    std::vector<std::vector<std::vector<std::vector<double>>>> Curvature_Higgs_CT_L4;
     /**
    * G^{abij}
    */
-    std::vector< std::vector< std::vector< std::vector<double> > > >Curvature_Gauge_G2H2;
+    std::vector<std::vector<std::vector<std::vector<double>>>> Curvature_Gauge_G2H2;
     /**
    * Y^{IJk} for Quarks
    */
-    std::vector< std::vector< std::vector< std::complex<double>> > > Curvature_Quark_F2H1;
+    std::vector<std::vector<std::vector<std::complex<double>>>> Curvature_Quark_F2H1;
     /**
    * Y^{IJk} for Leptons
    */
-    std::vector< std::vector< std::vector< std::complex<double>> > > Curvature_Lepton_F2H1;
+    std::vector<std::vector<std::vector<std::complex<double>>>> Curvature_Lepton_F2H1;
+
+    /**
+     * @brief Y^{IJk} for non-SM like light fermions with Majorana mass terms
+     * 
+     */
+    std::vector<std::vector<std::vector<std::complex<double>>>> Curvature_NonSMFermion_F2H1;
+
+    /**
+     * @brief Y^{IJ} for non-SM like light fermions with Majorana mass terms
+     * 
+     */
+    std::vector<std::vector<std::complex<double>>> Curvature_NonSMFermion_F2;
     /**
      * @brief MassSquaredHiggs Stores the masses of the Higgs Bosons calculated in CalculatePhysicalCouplings
      */
@@ -441,40 +455,39 @@ protected:
     /**
    * Storage of the Higgs rotation matrix for the Higgs mass matrix at the tree-level Vacuum
    */
-    std::vector< std::vector<double> > HiggsRotationMatrix;
+    std::vector<std::vector<double>> HiggsRotationMatrix;
     /**
      * @brief Couplings_Higgs_Quartic Stores the quartic Higgs couplings in the mass base
      */
-    std::vector< std::vector< std::vector< std::vector<double>>>> Couplings_Higgs_Quartic;
+    std::vector<std::vector<std::vector<std::vector<double>>>> Couplings_Higgs_Quartic;
     /**
      * @brief Couplings_Higgs_Triple Stores the triple Higgs couplings in the mass base
      */
-    std::vector< std::vector< std::vector< double >>> Couplings_Higgs_Triple;
+    std::vector<std::vector<std::vector<double>>> Couplings_Higgs_Triple;
     /**
      * @brief Couplings_Gauge_Higgs_22 Stores the couplings between two Higgs and two gauge bosons in the mass base
      */
-    std::vector< std::vector< std::vector< std::vector<double>>>> Couplings_Gauge_Higgs_22;
+    std::vector<std::vector<std::vector<std::vector<double>>>> Couplings_Gauge_Higgs_22;
     /**
      * @brief Couplings_Gauge_Higgs_21 Stores the coupling between two gauge and one Higgs boson in the mass base
      */
-    std::vector< std::vector< std::vector< double >>> Couplings_Gauge_Higgs_21;
+    std::vector<std::vector<std::vector<double>>> Couplings_Gauge_Higgs_21;
     /**
      * @brief Couplings_Quark_Higgs_22 Stores the couplings between two quarks and two Higgs bosons in the mass base
      */
-    std::vector< std::vector< std::vector< std::vector<std::complex<double>>>>> Couplings_Quark_Higgs_22;
+    std::vector<std::vector<std::vector<std::vector<std::complex<double>>>>> Couplings_Quark_Higgs_22;
     /**
      * @brief Couplings_Quark_Higgs_21 Stores the couplings between two quarks and one Higgs boson in the mass base
      */
-    std::vector< std::vector< std::vector< std::complex<double> >>> Couplings_Quark_Higgs_21;
+    std::vector<std::vector<std::vector<std::complex<double>>>> Couplings_Quark_Higgs_21;
     /**
      * @brief Couplings_Lepton_Higgs_22 Stores the couplings between two leptons and two Higgs bosons in the mass base
      */
-    std::vector< std::vector< std::vector< std::vector<std::complex<double>>>>> Couplings_Lepton_Higgs_22;
+    std::vector<std::vector<std::vector<std::vector<std::complex<double>>>>> Couplings_Lepton_Higgs_22;
     /**
      * @brief Couplings_Quark_Higgs_21 Stores the couplings between two leptons and one Higgs boson in the mass base
      */
-    std::vector< std::vector< std::vector< std::complex<double> >>> Couplings_Lepton_Higgs_21;
-
+    std::vector<std::vector<std::vector<std::complex<double>>>> Couplings_Lepton_Higgs_21;
 
     /**
      * @brief LambdaGauge_3 Stores the Lambda_{(G)}^{abi} tensor
@@ -491,49 +504,48 @@ protected:
     /**
      * @brief LambdaQuark_3 Stores the Lambda_{(F)}^{IJk} tensor for quarks , describing the derivative of Lambda_{(F)}^{IJ} w.r.t. the Higgs field k
      */
-    std::vector< std::vector< std::vector< std::complex<double> >>> LambdaQuark_3;
+    std::vector<std::vector<std::vector<std::complex<double>>>> LambdaQuark_3;
     /**
      * @brief LambdaLepton_3 Stores the Lambda_{(F)}^{IJk} tensor for leptons , describing the derivative of Lambda_{(F)}^{IJ} w.r.t. the Higgs field k
      */
-    std::vector< std::vector< std::vector< std::complex<double> >>> LambdaLepton_3;
+    std::vector<std::vector<std::vector<std::complex<double>>>> LambdaLepton_3;
     /**
      * @brief LambdaQuark_4 Stores the Lambda_{(F)}^{IJkm} tensor for quarks , describing the derivative of Lambda_{(F)}^{IJ} w.r.t. the Higgs fields k and m
      */
-    std::vector< std::vector< std::vector< std::vector<std::complex<double> >>>> LambdaQuark_4;
+    std::vector<std::vector<std::vector<std::vector<std::complex<double>>>>> LambdaQuark_4;
     /**
      * @brief LambdaLepton_4 Stores the Lambda_{(F)}^{IJkm} tensor for leptons , describing the derivative of Lambda_{(F)}^{IJ} w.r.t. the Higgs fields k and m
      */
-    std::vector< std::vector< std::vector< std::vector<std::complex<double> >>>> LambdaLepton_4;
+    std::vector<std::vector<std::vector<std::vector<std::complex<double>>>>> LambdaLepton_4;
 
     /**
      * @brief DebyeHiggs Stores the debye corrections to the mass matrix of the Higgs bosons
      */
-    std::vector< std::vector<double>> DebyeHiggs;
+    std::vector<std::vector<double>> DebyeHiggs;
     /**
      * @brief DebyeGauge Stores the debye corrections to the mass matrix of the gauge bosons
      */
-    std::vector< std::vector<double>> DebyeGauge;
+    std::vector<std::vector<double>> DebyeGauge;
     /**
      * @brief VevOrder Stores the matching order used in MinimizeOrderVEV, set in the constructor of the model
      */
     std::vector<std::size_t> VevOrder;
 
-
-public:
-    Class_Potential_Origin ();
-    virtual   ~Class_Potential_Origin ();
+  public:
+    Class_Potential_Origin();
+    virtual ~Class_Potential_Origin();
 
     /**
    * @brief get_scale
    * @return the MSBar renormalisation scale
    */
-    double get_scale() const { return  scale;}
+    double get_scale() const { return scale; }
 
     /**
    * @brief set_scale sets the MSBar renormalisation scale to scale_new
    * @param scale_new
    */
-    void set_scale(double scale_new) {scale = scale_new;}
+    void set_scale(double scale_new) { scale = scale_new; }
     /**
    * @brief get_nPar
    * @return nPar
@@ -548,23 +560,23 @@ public:
    * @brief get_nVEV
    * @return nVEV
    */
-    std::size_t get_nVEV() const {return  nVEV;}
+    std::size_t get_nVEV() const { return nVEV; }
     /**
    * @brief get_vevTreeMin
    * @return vevTreeMin
    */
-    std::vector<double> get_vevTreeMin() const {return vevTreeMin;}
+    std::vector<double> get_vevTreeMin() const { return vevTreeMin; }
     /**
    * @brief get_vevTreeMin
    * @param k
    * @return vevTreeMin.at(k)
    */
-    double get_vevTreeMin(const std::size_t& k) const {return vevTreeMin.at(k);}
+    double get_vevTreeMin(const std::size_t &k) const { return vevTreeMin.at(k); }
     /**
    * @brief get_parStored
    * @return parStored
    */
-    std::vector<double> get_parStored() const { return  parStored; }
+    std::vector<double> get_parStored() const { return parStored; }
     /**
    * @brief get_parCTStored
    * @return parCTStored
@@ -584,12 +596,12 @@ public:
    * @brief get_NHiggs
    * @return NHiggs
    */
-    std::size_t get_NHiggs() const { return  NHiggs; }
+    std::size_t get_NHiggs() const { return NHiggs; }
     /**
    * @brief get_NLepton
    * @return NLepton
    */
-    std::size_t get_NLepton() const { return  NLepton; }
+    std::size_t get_NLepton() const { return NLepton; }
     /**
    * @brief get_Model
    * @return ModelID of the Model
@@ -607,8 +619,9 @@ public:
    * @param k
    * @return TripleHiggsCorrectionsTreePhysical[i][j][k]
    */
-    double get_TripleHiggsCorrectionsTreePhysical(std::size_t i, std::size_t j, std::size_t k) const {
-        return TripleHiggsCorrectionsTreePhysical.at(i).at(j).at(k);
+    double get_TripleHiggsCorrectionsTreePhysical(std::size_t i, std::size_t j, std::size_t k) const
+    {
+      return TripleHiggsCorrectionsTreePhysical.at(i).at(j).at(k);
     }
     /**
    * @brief get_TripleHiggsCorrectionsCTPhysical
@@ -617,8 +630,9 @@ public:
    * @param k
    * @return TripleHiggsCorrectionsCTPhysical[i][j][k]
    */
-    double get_TripleHiggsCorrectionsCTPhysical(std::size_t i, std::size_t j, std::size_t k) const {
-        return TripleHiggsCorrectionsCTPhysical.at(i).at(j).at(k);
+    double get_TripleHiggsCorrectionsCTPhysical(std::size_t i, std::size_t j, std::size_t k) const
+    {
+      return TripleHiggsCorrectionsCTPhysical.at(i).at(j).at(k);
     }
     /**
    * @brief get_TripleHiggsCorrectionsCWPhysical
@@ -627,15 +641,15 @@ public:
    * @param k
    * @return TripleHiggsCorrectionsCWPhysical[i][j][k]
    */
-    double get_TripleHiggsCorrectionsCWPhysical(std::size_t i, std::size_t j, std::size_t k) const {
-        return  TripleHiggsCorrectionsCWPhysical.at(i).at(j).at(k);
+    double get_TripleHiggsCorrectionsCWPhysical(std::size_t i, std::size_t j, std::size_t k) const
+    {
+      return TripleHiggsCorrectionsCWPhysical.at(i).at(j).at(k);
     }
 
     /**
    * Sets the UseIndexCol var
    */
     void setUseIndexCol(std::string legend);
-
 
     /**
    * Initializes all vectors needed for the calculations.
@@ -649,21 +663,21 @@ public:
    * @param diff Switch for the derivative of the potential. Default is 0 for the value of the potential
    * @param Order 0 returns the tree level potential and 1 the NLO potential. Default value is the NLO potential
    */
-    double VEff(const std::vector<double>& v,double Temp=0, int diff=0, int Order = 1) const;
+    double VEff(const std::vector<double> &v, double Temp = 0, int diff = 0, int Order = 1) const;
     /**
    * Calculates the tree-level potential and its derivatives.
    * @param v the configuration of all VEVs at which the potential should be calculated
    * @param diff 0 returns the potential and i!= 0 returns the derivative of the potential w.r.t v_i
    * @param ForceExplicitCalculation Calculate the tensors directly from the tensors even if VTreeSimplified() is given
    */
-    double VTree(const std::vector<double>& v, int diff = 0,bool ForceExplicitCalculation=false) const;
+    double VTree(const std::vector<double> &v, int diff = 0, bool ForceExplicitCalculation = false) const;
     /**
    * Calculates the counterterm potential and its derivatives
    * @param v the configuration of all VEVs at which the potential should be calculated
    * @param diff 0 returns the potential and i!= 0 returns the derivative of the potential w.r.t v_i
    * @param ForceExplicitCalculation Calculate the tensors directly from the tensors even if VCounterSimplified() is given
    */
-    double CounterTerm(const std::vector<double>& v , int diff=0,bool ForceExplicitCalculation=false ) const;
+    double CounterTerm(const std::vector<double> &v, int diff = 0, bool ForceExplicitCalculation = false) const;
     /**
    * Calculates the Coleman-Weinberg and temperature-dependent 1-loop part of the effective potential and its derivatives.
    * @param diff 0: No derivative, > 0 derivative w.r.t to the Higgs field; -1 : derivative w.r.t to the temperature
@@ -671,17 +685,16 @@ public:
    * @param Temp the temperature at which the potential should be evaluated
    * @return the value of the one-loop part of the effective potential
    */
-    double V1Loop(const std::vector<double>& v, double Temp, int diff) const;
+    double V1Loop(const std::vector<double> &v, double Temp, int diff) const;
     /**
    * This function calculates the EW breaking VEV from all contributing field configurations.
    */
-    double EWSBVEV(const std::vector<double>& v) const;
-
+    double EWSBVEV(const std::vector<double> &v) const;
 
     /**
    * Reads the string linestr and sets the parameter point
    */
-    virtual void ReadAndSet(const std::string& linestr, std::vector<double>& par) = 0;
+    virtual void ReadAndSet(const std::string &linestr, std::vector<double> &par) = 0;
     /**
    * Adds the name of the counterterms to the legend of the output file. This has to be specified in
    * the model file.
@@ -705,28 +718,26 @@ public:
      */
     virtual std::vector<std::string> addLegendVEV() const = 0;
 
-
     /**
    * Reads the Lagrangian parameters from the vector 'par' and sets them to the model parameters. This also sets
    * the VEV configuration as well as the scale.
    * This has to be specified in the model file.
    */
-    virtual void set_gen(const std::vector<double>& par) = 0;
+    virtual void set_gen(const std::vector<double> &par) = 0;
     /**
    * Reads the counterterm parameters from the vector 'par' and sets them to the model parameters as well
    * as the Tensors \p Curvature_Higgs_CT_L1, \p Curvature_Higgs_CT_L2, \p Curvature_Higgs_CT_L3
    * , \p Curvature_Higgs_CT_L4 .
      * This has to be specified in the model file.
      */
-    virtual void set_CT_Pot_Par(const std::vector<double>& par) = 0;
+    virtual void set_CT_Pot_Par(const std::vector<double> &par) = 0;
     /**
    * This will produce a terminal output of all the model parameters.
      * This has to be specified in the model file.
      */
     virtual void write() const = 0;
 
-
-    void set_All(const std::vector<double>& par,const std::vector<double>& parCT);
+    void set_All(const std::vector<double> &par, const std::vector<double> &parCT);
 
     /**
     * This will set all the tensors needed to describe the tree-level Lagrangian
@@ -778,12 +789,10 @@ public:
     */
     virtual bool CalculateDebyeGaugeSimplified() = 0;
 
-
-
     /**
    * You can give the explicit form of your tree-level potential here. This speeds up the computation time.
    */
-    virtual double VTreeSimplified(const std::vector<double>& v) const = 0;
+    virtual double VTreeSimplified(const std::vector<double> &v) const = 0;
     /**
      * @brief UseVTreeSimplified Decides wether VTreeSimplified will be used or not. VTreeSimplified returns 0 if UseVTreeSimplified is false
      * Set in constructor of the implemented models
@@ -792,7 +801,7 @@ public:
     /**
    * You can give the explicit form of your counterterm potential here. This speeds up the computation time.
    */
-    virtual double VCounterSimplified(const std::vector<double>& v) const = 0;
+    virtual double VCounterSimplified(const std::vector<double> &v) const = 0;
     /**
      * @brief UseVCounterSimplified Decides wether VCounterSimplified will be used or not. VCounterSimplified returns 0 if UseVCounterSimplified is false
      * Set in constructor of the implemented models
@@ -806,7 +815,7 @@ public:
    * @param diff 0 returns the masses and i!=0 returns the derivative of m^2 w.r.t v_i, i = -1 returns the derivative w.r.t. to the temperature
    * @return Vector in which the eigenvalues m^2 of the mass matrix will be stored
    */
-    std::vector<double> HiggsMassesSquared(const std::vector<double>& v, const double& Temp = 0, const int& diff = 0) const;
+    std::vector<double> HiggsMassesSquared(const std::vector<double> &v, const double &Temp = 0, const int &diff = 0) const;
     /**
    * Calculates the gauge mass matrix and saves all eigenvalues
    * @param v the configuration of all VEVs at which the eigenvalues should be evaluated
@@ -814,7 +823,7 @@ public:
    * @param diff 0 returns the masses and i!=0 returns the derivative of m^2 w.r.t v_i, -1 returns the derivative w.r.t. the temperature
    * @return Vector in which the eigenvalues m^2 of the mass matrix will be stored
    */
-    std::vector<double> GaugeMassesSquared(const std::vector<double>& v, const double& Temp = 0, const int& diff = 0) const;
+    std::vector<double> GaugeMassesSquared(const std::vector<double> &v, const double &Temp = 0, const int &diff = 0) const;
     /**
    * Calculates the quark mass matrix and saves all eigenvalues, this assumes the same masses
    *  for different colours.
@@ -822,14 +831,21 @@ public:
    * @param diff 0 returns the masses and i!=0 returns the derivative of m^2 w.r.t v_i
    * @return Vector in which the eigenvalues m^2 of the mass matrix will be stored
    */
-    std::vector<double> QuarkMassesSquared(const std::vector<double>& v, const int& diff = 0) const;
+    std::vector<double> QuarkMassesSquared(const std::vector<double> &v, const int &diff = 0) const;
     /**
    * Calculates the lepton mass matrix and saves all eigenvalues
    * @param v the configuration of all VEVs at which the eigenvalues should be evaluated
    * @param diff 0 returns the masses and i!=0 returns the derivative of m^2 w.r.t v_i
    * @return Vector in which the eigenvalues m^2 of the mass matrix will be stored
    */
-    std::vector<double> LeptonMassesSquared(const std::vector<double>& v, const int& diff = 0) const;
+    std::vector<double> LeptonMassesSquared(const std::vector<double> &v, const int &diff = 0) const;
+    /**
+   * Calculates the Non-SM like fermion mass matrix and saves all eigenvalues
+   * @param v the configuration of all VEVs at which the eigenvalues should be evaluated
+   * @param diff 0 returns the masses and i!=0 returns the derivative of m^2 w.r.t v_i
+   * @return Vector in which the eigenvalues m^2 of the mass matrix will be stored
+   */
+    std::vector<double> NonSMFermionMassesSquared(const std::vector<double> &v, const int &diff = 0) const;
 
     /**
    * Calculates the quark mass matrix and saves all eigenvalues, this assumes the same masses
@@ -837,14 +853,14 @@ public:
    * @param v the configuration of all VEVs at which the eigenvalues should be evaluated
    * @return Vector in which the complex eigenvalues m of the mass matrix will be stored
    */
-    std::vector<std::complex<double>> QuarkMasses(const std::vector<double>& v) const;
+    std::vector<std::complex<double>> QuarkMasses(const std::vector<double> &v) const;
     /**
    * Calculates the quark mass matrix and saves all eigenvalues, this assumes the same masses
    *  for different colours.
    * @param v the configuration of all VEVs at which the eigenvalues should be evaluated
    * @return Vector in which the complex eigenvalues m of the mass matrix will be stored
    */
-    std::vector<std::complex<double>> LeptonMasses(const std::vector<double>& v) const;
+    std::vector<std::complex<double>> LeptonMasses(const std::vector<double> &v) const;
 
     /**
    * Calculates the triple Higgs couplings at NLO in the mass basis.
@@ -856,7 +872,7 @@ public:
     /**
    * Calculates the function f^1 needed for the derivatives of the Coleman Weinberg potential.
    */
-    double fbase(double MassSquaredA,double MassSquaredB) const;
+    double fbase(double MassSquaredA, double MassSquaredB) const;
     /**
    * Calculates the function f^2 needed for the 3rd derivatives of the Coleman Weinberg potential.
    */
@@ -867,12 +883,11 @@ public:
   */
     virtual std::vector<double> calc_CT() const = 0;
 
-
     /**
    * Calculates the Coleman-Weinberg contribution of a particle with m^2 =  MassSquared and the constant scheme-dependent parameter cb
    * as well as the first derivative with respect to m^2.
    */
-    double CWTerm(double MassSquared, double cb, int diff=0) const;
+    double CWTerm(double MassSquared, double cb, int diff = 0) const;
     /**
    * Calculates Re(log(MassSquared)) and returns 0 if the argument is too small as this function is only called with an (m^2)^n
    * in front of it.
@@ -888,12 +903,11 @@ public:
    *
    *
    */
-    double boson(double MassSquared, double Temp, double cb, int diff=0) const;
+    double boson(double MassSquared, double Temp, double cb, int diff = 0) const;
     /**
    * Deprecated version of boson() as present in the v1.X release. Still here for legacy reasons
    */
-    [[deprecated("Use this only if you want to calculate the effective potential with the exact same routine used in BSMPT v1.x. Use boson otherwise.")]]
-    double boson_legacy(double MassSquared, double Temp, double cb, int diff=0) const;
+    [[deprecated("Use this only if you want to calculate the effective potential with the exact same routine used in BSMPT v1.x. Use boson otherwise.")]] double boson_legacy(double MassSquared, double Temp, double cb, int diff = 0) const;
     /**
    * @brief Calculation of the fermionic std::size_tegral + Coleman-Weinberg potential __without__ taking d.o.f. std::size_to account
    *
@@ -901,18 +915,17 @@ public:
    * @param Temp = temperature at which the std::size_tegrals should be calculated
    * @param diff :  0 = Value of the potential, diff > 0 returns the derivative w.r.t. m^2 and diff=-1 w.r.t Temp
    */
-    double fermion(double MassSquared, double Temp, int diff=0) const;
+    double fermion(double MassSquared, double Temp, int diff = 0) const;
     /**
    * Deprecated version of fermion() as present in the v1.X release. Still here for legacy reasons
    */
-    [[deprecated("Use this only if you want to calculate the effective potential with the exact same routine used in BSMPT v1.x. Use fermion otherwise.")]]
-    double fermion_legacy(double Mass, double Temp, int diff=0) const;
+    [[deprecated("Use this only if you want to calculate the effective potential with the exact same routine used in BSMPT v1.x. Use fermion otherwise.")]] double fermion_legacy(double Mass, double Temp, int diff = 0) const;
     /**
    * Calculates the large m^2/T^2 approximation to order n for the temperature-dependent std::size_tegrals.
    */
     [[deprecated("Use this only if you want to calculate the effective potential with the exact same routine used in BSMPT v1.x. "
-                 "Otherwise use ThermalFunctions::JInterpolatedHigh.")]]
-    double Vl(double MassSquared, double Temp, int n, int diff =0 ) const;
+                 "Otherwise use ThermalFunctions::JInterpolatedHigh.")]] double
+    Vl(double MassSquared, double Temp, int n, int diff = 0) const;
     /**
    * Calculates the small m^2/T^2 approximation of the fermionic temperature dependent std::size_tegral to the n-th order.
    * @param MassSquared m^2
@@ -921,15 +934,15 @@ public:
    * @param diff 0 = value; >0 derivative w.r.t.
    */
     [[deprecated("Use this only if you want to calculate the effective potential with the exact same routine used in BSMPT v1.x. "
-                 "Otherwise use ThermalFunctions::JfermionInterpolatedLow.")]]
-    double Vsf(double MassSquared, double Temp, int n, int diff = 0) const;
+                 "Otherwise use ThermalFunctions::JfermionInterpolatedLow.")]] double
+    Vsf(double MassSquared, double Temp, int n, int diff = 0) const;
 
     /**
    * Calculates the small m^2/T^2 approximation of the bosonic temperature dependent std::size_tegral to the n-th order.
    */
     [[deprecated("Use this only if you want to calculate the effective potential with the exact same routine used in BSMPT v1.x. "
-                 "Otherwise use ThermalFunctions::JbosonInterpolatedLow.")]]
-    double Vsb(double MassSquaredIn, double Temp, int n, int diff = 0) const;
+                 "Otherwise use ThermalFunctions::JbosonInterpolatedLow.")]] double
+    Vsb(double MassSquaredIn, double Temp, int n, int diff = 0) const;
 
     /**
    * Resets all bools. Needed if you want to deal with multiple posize_ts one after another with the same pointer.
@@ -943,7 +956,7 @@ public:
    * @param VEVminimizer vector with the VEVs, used as inputs for the minimizers
    * @return vector with all VEVs, filled with zeroes for fields which do not have a VEV
    */
-    std::vector<double> MinimizeOrderVEV(const std::vector<double>& VEVminimizer) const;
+    std::vector<double> MinimizeOrderVEV(const std::vector<double> &VEVminimizer) const;
 
     /**
    * Calculates the first derivatives of the eigenvalues of a given matrix
@@ -951,7 +964,7 @@ public:
    * @param MDiff : the element-wise first derivative of the matrix M with respect to the parameter you want to consider
    * @return vector containing the mass eigenvalues and then the derivatives in the same order
    */
-    std::vector<double> FirstDerivativeOfEigenvalues(const Eigen::Ref<Eigen::MatrixXcd> M,const Eigen::Ref<Eigen::MatrixXcd> MDiff) const;
+    std::vector<double> FirstDerivativeOfEigenvalues(const Eigen::Ref<Eigen::MatrixXcd> M, const Eigen::Ref<Eigen::MatrixXcd> MDiff) const;
     /**
    * This function calculates the second derivatives of all eigenvalues.
    * The matrix must not have a repeated eigenvalue for this!
@@ -962,31 +975,27 @@ public:
    * @return the mass eigenvalues in the vector and then the derivatives in the same order
    */
     std::vector<double> SecondDerivativeOfEigenvaluesNonRepeated(
-            const Eigen::Ref<Eigen::MatrixXd> M,
-            const Eigen::Ref<Eigen::MatrixXd> MDiffX,
-            const Eigen::Ref<Eigen::MatrixXd> MDiffY,
-            const Eigen::Ref<Eigen::MatrixXd> MDiffXY) const;
-
+        const Eigen::Ref<Eigen::MatrixXd> M,
+        const Eigen::Ref<Eigen::MatrixXd> MDiffX,
+        const Eigen::Ref<Eigen::MatrixXd> MDiffY,
+        const Eigen::Ref<Eigen::MatrixXd> MDiffXY) const;
 
     /**
   * This function will check if the VEV at NLO is still close enough to the LO VEV. v has to be given in the configuration
   * of the minimizer.
   */
-    bool CheckNLOVEV(const std::vector<double>& v) const;
-
-
+    bool CheckNLOVEV(const std::vector<double> &v) const;
 
     /**
    * This is a possible debugging function.
    */
-    virtual void Debugging(const std::vector<double>& input, std::vector<double>& output) const =0;
-
+    virtual void Debugging(const std::vector<double> &input, std::vector<double> &output) const = 0;
 
     /**
    * Checks if the tensors are correctly implemented. For this the fermion, quark and gauge boson masses are calculated and
    * printed next to the values defined in SMparah.h
    */
-    void CheckImplementation(const int& WhichMinimizer = Minimizer::WhichMinimizerDefault) const;
+    void CheckImplementation(const int &WhichMinimizer = Minimizer::WhichMinimizerDefault) const;
 
     /**
    * Find all possible sign combinations of the vevs under which the potential is invariant
@@ -1014,18 +1023,14 @@ public:
      * @param par Parameters to define the parameter point. Same input as in set_gen()
      * @return Vector with the CT
      */
-    std::vector<double> initModel(const std::vector<double>& par);
+    std::vector<double> initModel(const std::vector<double> &par);
 
     /**
    * @brief resetScale changes the MSBar scale to newScale
    * @param newScale the new Scale in GeV
    * @return the CT at the new scale
    */
-    std::vector<double> resetScale(const double& newScale);
-
-
-
-
+    std::vector<double> resetScale(const double &newScale);
 
     /**
    * Calculate the ratio of the latent heat w.r.t. the energy density of the plasma background
@@ -1033,16 +1038,10 @@ public:
    */
 
     double CalculateRatioAlpha(
-            const std::vector<double>& vev_symmetric,
-            const std::vector<double>& vev_broken,
-            const double& Temp) const;
+        const std::vector<double> &vev_symmetric,
+        const std::vector<double> &vev_broken,
+        const double &Temp) const;
+  };
 
-
-};
-
-
-
-
-
-}
+} // namespace BSMPT
 #endif /* CLASSPOTENTIALORIGIN_H_ */

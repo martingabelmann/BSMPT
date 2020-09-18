@@ -1772,7 +1772,122 @@ std::vector<double> Class_Potential_Origin::LeptonMassesSquared(const std::vecto
 
 
 }
+std::vector<double> Class_Potential_Origin::NonSMFermionMassesSquared(const std::vector<double>& v, const int& diff) const
+{
+    std::vector<double> res;
+	if(v.size() != nVEV and v.size() != NHiggs){
+	      std::string ErrorString = std::string("You have called ") + std::string(__func__)
+	        + std::string(" with an invalid vev configuration. Your vev is of dimension ")
+	      + std::to_string(v.size()) + std::string(" and it should be ") + std::to_string(NHiggs) + std::string(".");
+	      throw std::runtime_error(ErrorString);
+	}
+	if(v.size() == nVEV and nVEV != NHiggs){
+		std::cerr << __func__ << " is being called with a wrong sized vev configuration. It has the dimension of "
+		    			<< nVEV << " while it should have " << NHiggs
+						<< ". For now this is transformed but please fix this to reduce the runtime." << std::endl;
+	  std::vector<double> Transformedv;
+      Transformedv=MinimizeOrderVEV(v);
+      res = NonSMFermionMassesSquared(Transformedv,diff);
+      return res;
+	}
+    if(!SetCurvatureDone) {
+//        SetCurvatureArrays();
+        std::string retmes = __func__;
+        retmes += "was called while the model was not initialised correctly.\n";
+        throw std::runtime_error(retmes);
+    }
+    MatrixXcd MassMatrix(NNonSMFermion,NNonSMFermion),MIJ(NNonSMFermion,NNonSMFermion);
+    MIJ = MatrixXcd::Zero(NNonSMFermion,NNonSMFermion);
+    double ZeroMass = std::pow(10,-10);
+    for(std::size_t i=0;i<NNonSMFermion;i++)
+    {
+        for(std::size_t j=0;j<NNonSMFermion;j++)
+        {
 
+            for(std::size_t k=0;k<NHiggs;k++)
+            {
+                MIJ(i,j) += Curvature_NonSMFermion_F2[i][j] + Curvature_NonSMFermion_F2H1[i][j][k]*v[k];
+            }
+        }
+    }
+
+    MassMatrix = MIJ.conjugate()*MIJ;
+
+    if(diff <= 0) // no temperature part here
+	{
+		SelfAdjointEigenSolver<MatrixXcd> es(MassMatrix,EigenvaluesOnly);
+        for(std::size_t i =0;i<NLepton;i++)
+		{
+			double tmp = es.eigenvalues().real()[i];
+			if(std::abs(tmp) < ZeroMass ) res.push_back(0);
+			else res.push_back(tmp);
+		}
+	}
+    else if(diff > 0 and static_cast<size_t>(diff) <= NHiggs){
+      std::size_t m = diff-1;
+	  MatrixXcd Diff(NNonSMFermion,NNonSMFermion);
+	  Diff = MatrixXcd::Zero(NNonSMFermion,NNonSMFermion);
+      for(std::size_t a=0;a<NNonSMFermion;a++){
+        for(std::size_t b=0;b<NNonSMFermion;b++){
+          for(std::size_t i=0;i<NNonSMFermion;i++){
+            for(std::size_t l=0;l<NHiggs;l++){
+                //Majorana terms do not produce derivatives in respect of the Higgs field
+			  Diff(a,b) += std::conj(Curvature_NonSMFermion_F2H1[a][i][m]) * Curvature_NonSMFermion_F2H1[i][b][l] * v[l];
+			  Diff(a,b) += std::conj(Curvature_NonSMFermion_F2H1[a][i][l]) * Curvature_NonSMFermion_F2H1[i][b][m] * v[l];
+			}
+		  }
+		}
+	  }
+
+      res=FirstDerivativeOfEigenvalues(MassMatrix,Diff);
+
+      for(std::size_t j=0;j<res.size();j++){
+		  if(std::isnan(res.at(j))){
+			  std::cout << "MassMatrix = \n" << MassMatrix << "\nDiff = \n" << Diff << std::endl;
+			  std::cout << "Fermion Masses : " ;
+              for(std::size_t i=0;i<NNonSMFermion;i++) std::cout << std::sqrt(std::abs(res.at(i))) << sep;
+			  std::cout << std::endl;
+			  std::cout << "VEV fields : ";
+              for(std::size_t i=0;i<v.size();i++) std::cout << v.at(i) << sep;
+			  std::cout << std::endl;
+
+
+
+
+              for(std::size_t l=0;l<NHiggs;l++){
+
+				  std::cout << "Curvature_Lepton * v an Higgs  =  :" << l << "\n";
+                  for(std::size_t a=0;a<NNonSMFermion;a++){
+                      for(std::size_t i=0;i<NNonSMFermion;i++){
+                          std::cout << Curvature_NonSMFermion_F2H1[a][i][l] * v[l] << sep;
+					  }
+					  std::cout << std::endl;
+				  }
+				  std::cout << "conj Curvature_Lepton an Higgs = :" << l << "\n";
+                  for(std::size_t a=0;a<NNonSMFermion;a++){
+                      for(std::size_t i=0;i<NNonSMFermion;i++){
+                          std::cout << std::conj(Curvature_NonSMFermion_F2H1[a][i][l]) *v[l] << sep;
+					  }
+					  std::cout << std::endl;
+				  }
+			  }
+
+			  std::string retmessage = "Nan found in ";
+			  retmessage+= __func__;
+			  retmessage+= " at deriv number ";
+			  retmessage+= std::to_string(j);
+			  retmessage+= " and m = ";
+			  retmessage+= std::to_string(m);
+			  throw std::runtime_error(retmessage);
+		  }
+	  }
+
+	}
+
+    return res;
+
+
+}
 
 double Class_Potential_Origin::VTree(const std::vector<double>& v, int diff, bool ForceExplicitCalculation) const
 {
@@ -1934,6 +2049,8 @@ double Class_Potential_Origin::V1Loop(const std::vector<double>& v, double Temp,
     GaugeMassesZeroTempVec= GaugeMassesSquared(v,0,diff);
     QuarkMassesVec=QuarkMassesSquared(v,diff);
     LeptonMassesVec=LeptonMassesSquared(v,diff);
+    std::vector<double> NonSMFermionMassVec={0};
+    if(NNonSMFermion>0)NonSMFermionMassVec=NonSMFermionMassesSquared(v,diff);
 
 
 	if(diff == 0)
@@ -1945,6 +2062,7 @@ double Class_Potential_Origin::V1Loop(const std::vector<double>& v, double Temp,
             for(std::size_t k=0;k<NGauge;k++) res += 2*boson(GaugeMassesZeroTempVec[k],Temp,C_CWcbGB,0);
             for(std::size_t k=0;k<NQuarks;k++) res += -6*fermion(QuarkMassesVec[k],Temp,0);
             for(std::size_t k=0;k<NLepton;k++) res += -2*fermion(LeptonMassesVec[k],Temp,0);
+            for(std::size_t k=0;k<NNonSMFermion;k++) res+=-2*fermion(NonSMFermionMassVec[k],Temp,0);//Non SM fermion contributions
         }
         else{
             HiggsMassesZeroTempVec=HiggsMassesSquared(v,0);
@@ -1954,6 +2072,8 @@ double Class_Potential_Origin::V1Loop(const std::vector<double>& v, double Temp,
             for(std::size_t k=0;k<NQuarks;k++) AddContQuark += -2*fermion(QuarkMassesVec[k],Temp,0);
             for(std::size_t k=0;k<NColour;k++) res += AddContQuark;
             for(std::size_t k=0;k<NLepton;k++) res += -2*fermion(LeptonMassesVec[k],Temp,0);
+
+            for(std::size_t k=0;k<NNonSMFermion;k++) res+= -2*fermion(NonSMFermionMassVec[k],Temp,0);//Non SM fermions --> Check the effective degree of freedom
 
 
             double VDebay = 0;
@@ -1989,6 +2109,9 @@ double Class_Potential_Origin::V1Loop(const std::vector<double>& v, double Temp,
             for(std::size_t k=0;k<NLepton;k++) {
 				res += -2*LeptonMassesVec.at(k+NLepton)*fermion(LeptonMassesVec[k],Temp,diff);
 			}
+            for(std::size_t k=0;k<NNonSMFermion;k++) {
+				res += -2*NonSMFermionMassVec.at(k+NNonSMFermion)*fermion(NonSMFermionMassVec[k],Temp,diff);
+			}
 		}
 		else{
             HiggsMassesZeroTempVec=HiggsMassesSquared(v,0,diff);
@@ -2006,7 +2129,9 @@ double Class_Potential_Origin::V1Loop(const std::vector<double>& v, double Temp,
             for(std::size_t k=0;k<NLepton;k++) {
 				res += -2*LeptonMassesVec.at(k+NLepton)*fermion(LeptonMassesVec[k],Temp,diff);
 			}
-
+            for(std::size_t k=0;k<NNonSMFermion;k++) {
+				res += -2*NonSMFermionMassVec.at(k+NNonSMFermion)*fermion(NonSMFermionMassVec[k],Temp,diff);
+			}
 
 			double VDebay = 0;
             for(std::size_t k=0;k<NHiggs;k++)
@@ -2051,6 +2176,9 @@ double Class_Potential_Origin::V1Loop(const std::vector<double>& v, double Temp,
             for(std::size_t k=0;k<NLepton;k++){
 				res += -2*fermion(LeptonMassesVec[k],Temp,-1);
 			}
+            for(std::size_t k=0;k<NNonSMFermion;k++){
+				res += -2*fermion(NonSMFermionMassVec[k],Temp,-1);
+			}
 		}
 		else{
             HiggsMassesZeroTempVec=HiggsMassesSquared(v,0,diff);
@@ -2064,6 +2192,7 @@ double Class_Potential_Origin::V1Loop(const std::vector<double>& v, double Temp,
             for(std::size_t k=0;k<NQuarks;k++) AddContQuark += -2*fermion(QuarkMassesVec[k],Temp,-1);
             for(std::size_t k=0;k<NColour;k++) res += AddContQuark;
             for(std::size_t k=0;k<NLepton;k++) res += -2*fermion(LeptonMassesVec[k],Temp,-1);
+            for(std::size_t k=0;k<NNonSMFermion;k++) res += -2*fermion(NonSMFermionMassVec[k],Temp,-1);
 
 
 			double VDebay = 0;
@@ -2238,6 +2367,10 @@ void Class_Potential_Origin::initVectors(){
     Curvature_Quark_F2H1 = vec3Complex{NQuarks,vec2Complex{NQuarks,vec1Complex(NHiggs,0)}};
     LambdaQuark_3 = vec3Complex{NQuarks,vec2Complex{NQuarks,vec1Complex(NHiggs,0)}};
     LambdaQuark_4 = vec4Complex{NQuarks,vec3Complex{NQuarks,vec2Complex{NHiggs,vec1Complex(NHiggs,0)}}};
+
+    
+    Curvature_NonSMFermion_F2 = vec2Complex{NNonSMFermion,vec1Complex(NNonSMFermion,0)};  
+    Curvature_NonSMFermion_F2H1=vec3Complex{NNonSMFermion,vec2Complex{NNonSMFermion,vec1Complex(NHiggs,0)}};
 
     HiggsVev = std::vector<double>(NHiggs,0);
 }

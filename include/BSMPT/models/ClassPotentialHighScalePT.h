@@ -48,6 +48,8 @@ public:
   double ms, lambda;
 
   double dms, dlambda, dT, yt, g;
+  double g1u; //nonSM fermion coupling
+  double mx; //Majorana mass 
 
 
 

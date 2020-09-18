@@ -9,9 +9,11 @@ set(header
 	${header_path}/ClassPotentialR2HDM.h
   ${header_path}/ClassPotentialRN2HDM.h
   ${header_path}/ClassPotentialCxSM.h
-
+  
   # Here you can add your new model
   ${header_path}/ClassTemplate.h
+  ${header_path}/ClassPotentialPNGDM.h
+  ${header_path}/ClassPotentialHighScalePT.h
 )
 
 set(src
@@ -28,6 +30,7 @@ set(src
   # Here you can add your new model
   ClassTemplate.cpp
   ClassPotentialPNGDM.cpp
+  ClassPotentialHighScalePT.cpp
 )
 
 add_library(Models ${header} ${src})

@@ -48,16 +48,17 @@ namespace Models{
  */
 Class_HighScalePT::Class_HighScalePT ()
 {
-  Model = ModelID::ModelIDs::TEMPLATE; // global int constant which will be used to tell the program which model is called
+  Model = ModelID::ModelIDs::HSPT; // global int constant which will be used to tell the program which model is called
   NNeutralHiggs = 1; // number of neutral Higgs bosons at T = 0
   NChargedHiggs=0; // number of charged Higgs bosons  at T = 0 (all d.o.f.)
 
-  nPar = 2; // number of parameters in the tree-Level Lagrangian
+  nPar = 4; // number of parameters in the tree-Level Lagrangian
   nParCT = 3; // number of parameters in the counterterm potential
 
   nVEV=1; // number of VEVs to minimize the potential
 
   NHiggs = NNeutralHiggs+NChargedHiggs;
+  NNonSMFermion=2; //Number of Non-SM like fermions
 
   VevOrder.resize(nVEV);
   // Here you have to tell which scalar field gets which VEV.
@@ -151,20 +152,25 @@ void Class_HighScalePT::ReadAndSet(const std::string& linestr, std::vector<doubl
 	double tmp;
 
 	double lms,llambda;
+	double lmx,lgu1;
 
     if (UseIndexCol){
         ss >> tmp;
     }
 
 
-	for(int k=1;k<=2;k++)
+	for(std::size_t k=1;k<=nPar;k++)
 	{
 	      ss>>tmp;
 	      if(k==1) lms = tmp;
 	      else if(k==2) llambda = tmp;
+		  else if(k==3) lmx =tmp;
+		  else if(k==4) lgu1 = tmp;
 	}
 	par[0] = lms;
 	par[1] = llambda;
+	par[2] = lmx;
+	par[3] = lgu1;
 
 
 	set_gen(par); // This you have to call so that everything will be set
@@ -178,7 +184,12 @@ void Class_HighScalePT::ReadAndSet(const std::string& linestr, std::vector<doubl
 void Class_HighScalePT::set_gen(const std::vector<double>& par) {
     ms = par[0]; // Class member is set accordingly to the input parameters
     lambda = par[1]; // Class member is set accordingly to the input parameters
-    g=C_g; // SM SU (2) gauge coupling --> SMparam .h
+
+	//nonSM Fermions
+	mx=par[2];
+	g1u=par[3];
+    
+	g=C_g; // SM SU (2) gauge coupling --> SMparam .h
     yt = std::sqrt(2)/C_vev0 * C_MassTop; // Top Yukawa coupling --> SMparam .h
     scale = C_vev0; // Renormalisation scale is set to the SM VEV
 	vevTreeMin.resize(nVEV);
@@ -186,7 +197,9 @@ void Class_HighScalePT::set_gen(const std::vector<double>& par) {
 	// Here you have to set the vector vevTreeMin. The vector vevTree will then be set by the function MinimizeOrderVEV
 	vevTreeMin[0] = C_vev0;
     vevTree=MinimizeOrderVEV(vevTreeMin);
+
 	if(!SetCurvatureDone) SetCurvatureArrays();
+	std::cout<<__func__<<" finished "<<std::endl;
 }
 
 /**
@@ -214,7 +227,9 @@ void Class_HighScalePT::write() const {
 
 	std::cout << "The parameters are : " << std::endl;
 	std::cout << "lambda = " << lambda << std::endl
-            << "m^2 = " << ms << std::endl;
+            << "m^2 = " << ms << std::endl
+			<< "mx^2 = "<< mx << std::endl
+			<< "g1u =" << g1u << std::endl;
 
 	std::cout << "The counterterm parameters are : " << std::endl;
 	std::cout << "dT = "<< dT << std::endl
@@ -387,6 +402,14 @@ void Class_HighScalePT::SetCurvatureArrays(){
 
 	Curvature_Quark_F2H1[1][0][0] = yt;
 	Curvature_Quark_F2H1[0][1][0] = yt;
+
+	Curvature_NonSMFermion_F2[0][0] = 0;
+	Curvature_NonSMFermion_F2[0][1] = g1u*C_vev0;
+	Curvature_NonSMFermion_F2[1][0] = g1u*C_vev0;
+	Curvature_NonSMFermion_F2[1][1] = mx;
+	Curvature_NonSMFermion_F2H1[1][0][0]=g1u;
+	Curvature_NonSMFermion_F2H1[0][1][0]=g1u;
+	
 
 }
 
