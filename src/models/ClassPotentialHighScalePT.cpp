@@ -199,7 +199,6 @@ void Class_HighScalePT::set_gen(const std::vector<double>& par) {
     vevTree=MinimizeOrderVEV(vevTreeMin);
 
 	if(!SetCurvatureDone) SetCurvatureArrays();
-	std::cout<<__func__<<" finished "<<std::endl;
 }
 
 /**

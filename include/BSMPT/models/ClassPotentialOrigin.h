@@ -453,6 +453,11 @@ namespace BSMPT
      */
     std::vector<double> MassSquaredLepton;
     /**
+     * @brief MassSqaredNonSMFermion stores the masses of the non-SM like fermions calculated in CalculatePhysicalCouplings
+     * 
+     */
+    std::vector<double> MassSqaredNonSMFermion;
+    /**
    * Storage of the Higgs rotation matrix for the Higgs mass matrix at the tree-level Vacuum
    */
     std::vector<std::vector<double>> HiggsRotationMatrix;
@@ -490,6 +495,15 @@ namespace BSMPT
     std::vector<std::vector<std::vector<std::complex<double>>>> Couplings_Lepton_Higgs_21;
 
     /**
+     * @brief Couplings_NonSMFermion_Higgs_22 Stores the couplings between two NonSM fermions and two Higgs bosons in the mass base
+     */
+    std::vector<std::vector<std::vector<std::vector<std::complex<double>>>>> Couplings_NonSMFermion_Higgs_22;
+    /**
+     * @brief Couplings_NonSMFermion_Higgs_21 Stores the couplings between two NonSM fermion and one Higgs boson in the mass base
+     */
+    std::vector<std::vector<std::vector<std::complex<double>>>> Couplings_NonSMFermion_Higgs_21;
+
+    /**
      * @brief LambdaGauge_3 Stores the Lambda_{(G)}^{abi} tensor
      */
     std::vector<std::vector<std::vector<double>>> LambdaGauge_3;
@@ -517,6 +531,14 @@ namespace BSMPT
      * @brief LambdaLepton_4 Stores the Lambda_{(F)}^{IJkm} tensor for leptons , describing the derivative of Lambda_{(F)}^{IJ} w.r.t. the Higgs fields k and m
      */
     std::vector<std::vector<std::vector<std::vector<std::complex<double>>>>> LambdaLepton_4;
+    /**
+     * @brief LambdaNonSMFermion_3 Stores the Lambda_{(F)}^{IJkm} tensor for NonSM fermions , describing the derivative of Lambda_{(F)}^{IJ} w.r.t. the Higgs fields k and m
+     */
+    std::vector<std::vector<std::vector<std::complex<double>>>> LambdaNonSMFermion_3;
+    /**
+     * @brief LambdaNonSMFermion_4 Stores the Lambda_{(F)}^{IJkm} tensor for NonSM fermions , describing the derivative of Lambda_{(F)}^{IJ} w.r.t. the Higgs fields k and m
+     */
+    std::vector<std::vector<std::vector<std::vector<std::complex<double>>>>> LambdaNonSMFermion_4;
 
     /**
      * @brief DebyeHiggs Stores the debye corrections to the mass matrix of the Higgs bosons
