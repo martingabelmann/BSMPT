@@ -48,8 +48,8 @@ public:
   double ms, lambda;
 
   double dms, dlambda, dT, yt, g;
-  double g1u; //nonSM fermion coupling
-  double mx; //Majorana mass 
+  double g1u,g2u,g1d,g2d; //nonSM Yukawa couplings
+  double muchi,mb,mw; //Majorana masses
 
 
 

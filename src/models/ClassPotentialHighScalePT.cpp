@@ -35,8 +35,8 @@
 using namespace Eigen;
 
 /**
- * @file
- * Template for adding a new model class
+ * SM + EWinos
+ *
  */
 
 namespace BSMPT{
@@ -52,13 +52,13 @@ Class_HighScalePT::Class_HighScalePT ()
   NNeutralHiggs = 1; // number of neutral Higgs bosons at T = 0
   NChargedHiggs=0; // number of charged Higgs bosons  at T = 0 (all d.o.f.)
 
-  nPar = 4; // number of parameters in the tree-Level Lagrangian
+  nPar = 9; // number of parameters in the tree-Level Lagrangian
   nParCT = 3; // number of parameters in the counterterm potential
 
   nVEV=1; // number of VEVs to minimize the potential
 
   NHiggs = NNeutralHiggs+NChargedHiggs;
-  NNonSMFermion=2; //Number of Non-SM like fermions
+  NNonSMFermion=6; //Number of Non-SM like fermions
 
   VevOrder.resize(nVEV);
   // Here you have to tell which scalar field gets which VEV.
@@ -152,7 +152,7 @@ void Class_HighScalePT::ReadAndSet(const std::string& linestr, std::vector<doubl
 	double tmp;
 
 	double lms,llambda;
-	double lmx,lgu1;
+	double lmuchi,lmb,lmw,lg1u,lg2u,lg1d,lg2d;
 
     if (UseIndexCol){
         ss >> tmp;
@@ -164,13 +164,23 @@ void Class_HighScalePT::ReadAndSet(const std::string& linestr, std::vector<doubl
 	      ss>>tmp;
 	      if(k==1) lms = tmp;
 	      else if(k==2) llambda = tmp;
-		  else if(k==3) lmx =tmp;
-		  else if(k==4) lgu1 = tmp;
+		  else if(k==3) lmuchi =tmp;
+		  else if(k==4) lmw = tmp;
+		  else if(k==5) lmb = tmp;
+		  else if(k==6) lg1u = tmp;
+		  else if(k==7) lg2u = tmp;
+		  else if(k==8) lg1d = tmp;
+		  else if(k==9) lg2d = tmp;
 	}
 	par[0] = lms;
 	par[1] = llambda;
-	par[2] = lmx;
-	par[3] = lgu1;
+	par[2] = lmuchi;
+	par[3] = lmw;
+	par[4] = lmb;
+	par[5] = lg1u;
+	par[6] = lg2u;
+	par[7] = lg1d;
+	par[8] = lg2d;
 
 
 	set_gen(par); // This you have to call so that everything will be set
@@ -186,8 +196,13 @@ void Class_HighScalePT::set_gen(const std::vector<double>& par) {
     lambda = par[1]; // Class member is set accordingly to the input parameters
 
 	//nonSM Fermions
-	mx=par[2];
-	g1u=par[3];
+	muchi = par[2];
+	mw    = par[3];
+	mb    = par[4];
+	g1u   = par[5];
+	g2u   = par[6];
+	g1d   = par[7];
+	g2d   = par[8];
     
 	g=C_g; // SM SU (2) gauge coupling --> SMparam .h
     yt = std::sqrt(2)/C_vev0 * C_MassTop; // Top Yukawa coupling --> SMparam .h
@@ -227,8 +242,13 @@ void Class_HighScalePT::write() const {
 	std::cout << "The parameters are : " << std::endl;
 	std::cout << "lambda = " << lambda << std::endl
             << "m^2 = " << ms << std::endl
-			<< "mx^2 = "<< mx << std::endl
-			<< "g1u =" << g1u << std::endl;
+			<< "mu_chi = "<< muchi << std::endl
+			<< "M_W = "<< muchi << std::endl
+			<< "M_B = "<< muchi << std::endl
+			<< "g_1u =" << g1u << std::endl
+			<< "g_2u =" << g2u << std::endl
+			<< "g_1d =" << g1d << std::endl
+			<< "g_2d =" << g2d << std::endl;
 
 	std::cout << "The counterterm parameters are : " << std::endl;
 	std::cout << "dT = "<< dT << std::endl
@@ -402,13 +422,54 @@ void Class_HighScalePT::SetCurvatureArrays(){
 	Curvature_Quark_F2H1[1][0][0] = yt;
 	Curvature_Quark_F2H1[0][1][0] = yt;
 
-	Curvature_NonSMFermion_F2[0][0] = 0;
-	Curvature_NonSMFermion_F2[0][1] = g1u*C_vev0;
-	Curvature_NonSMFermion_F2[1][0] = g1u*C_vev0;
-	Curvature_NonSMFermion_F2[1][1] = mx;
-	Curvature_NonSMFermion_F2H1[1][0][0]=g1u;
-	Curvature_NonSMFermion_F2H1[0][1][0]=g1u;
+    /* neutralino masses */
+	Curvature_NonSMFermion_F2[0][0] = mb;
+	Curvature_NonSMFermion_F2[0][1] = 0;
+	Curvature_NonSMFermion_F2[0][2] = -g1d*C_vev0/2;
+	Curvature_NonSMFermion_F2[0][3] = -g1u*C_vev0/2;
+	Curvature_NonSMFermion_F2[1][1] = mw;
+	Curvature_NonSMFermion_F2[1][2] = g2d*C_vev0/2;
+	Curvature_NonSMFermion_F2[1][3] = -g2u*C_vev0/2;
+	Curvature_NonSMFermion_F2[2][2] = 0;
+	Curvature_NonSMFermion_F2[2][3] = -muchi;
+	Curvature_NonSMFermion_F2[3][3] = 0;
+	Curvature_NonSMFermion_F2[3][2] = Curvature_NonSMFermion_F2[2][3];
+	Curvature_NonSMFermion_F2[3][1] = Curvature_NonSMFermion_F2[1][3];
+	Curvature_NonSMFermion_F2[2][1] = Curvature_NonSMFermion_F2[1][2];
+	Curvature_NonSMFermion_F2[3][0] = Curvature_NonSMFermion_F2[0][3];
+	Curvature_NonSMFermion_F2[1][0] = Curvature_NonSMFermion_F2[0][1];
+
+    /* chargino masses */
+	Curvature_NonSMFermion_F2[4][4] = mw;
+	Curvature_NonSMFermion_F2[4][5] = g2u*C_vev0/2;
+	Curvature_NonSMFermion_F2[5][4] = g2d*C_vev0/2;
+	Curvature_NonSMFermion_F2[5][5] = muchi;
+
+    /* neutralino yukawas */
+	Curvature_NonSMFermion_F2H1[0][2][0] = g1d/2;
+	Curvature_NonSMFermion_F2H1[0][3][0] = -g1u/2;
+	Curvature_NonSMFermion_F2H1[1][2][0] = -g2d/2;
+	Curvature_NonSMFermion_F2H1[1][3][0] = g2u/2;
 	
+    Curvature_NonSMFermion_F2H1[2][0][0] = Curvature_NonSMFermion_F2H1[0][2][0];
+    Curvature_NonSMFermion_F2H1[3][0][0] = Curvature_NonSMFermion_F2H1[0][3][0];
+    Curvature_NonSMFermion_F2H1[2][1][0] = Curvature_NonSMFermion_F2H1[1][2][0];
+    Curvature_NonSMFermion_F2H1[3][1][0] = Curvature_NonSMFermion_F2H1[1][3][0];
+
+	Curvature_NonSMFermion_F2H1[0][0][0]=0;
+	Curvature_NonSMFermion_F2H1[1][0][0]=0;
+	Curvature_NonSMFermion_F2H1[0][1][0]=0;
+	Curvature_NonSMFermion_F2H1[1][1][0]=0;
+	Curvature_NonSMFermion_F2H1[2][2][0]=0;
+	Curvature_NonSMFermion_F2H1[2][3][0]=0;
+	Curvature_NonSMFermion_F2H1[3][2][0]=0;
+	Curvature_NonSMFermion_F2H1[3][3][0]=0;
+	
+    /* chargino yukawas */
+	Curvature_NonSMFermion_F2H1[4][4][0] = 0;
+	Curvature_NonSMFermion_F2H1[4][5][0] = -g2u/std::sqrt(2);
+	Curvature_NonSMFermion_F2H1[5][4][0] = -g2d/std::sqrt(2);
+	Curvature_NonSMFermion_F2H1[5][5][0] = 0;
 
 }
 
