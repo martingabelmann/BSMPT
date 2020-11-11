@@ -1046,7 +1046,7 @@ namespace BSMPT
         FirstDerivHiggs = VectorXd::Zero(NHiggs);
         FirstDerivQuark = VectorXd::Zero(NHiggs);
         FirstDerivLepton = VectorXd::Zero(NHiggs);
-        FirstDerivNonSMFermion = VectorXd::Zero(NNonSMFermion); //NEW
+        FirstDerivNonSMFermion = VectorXd::Zero(NHiggs); //NEW
         double epsilon = 1.0 / (16 * M_PI * M_PI);
 
         for (std::size_t i = 0; i < NHiggs; i++)
@@ -2315,8 +2315,11 @@ namespace BSMPT
                     res += -6 * fermion(QuarkMassesVec[k], Temp, 0);
                 for (std::size_t k = 0; k < NLepton; k++)
                     res += -2 * fermion(LeptonMassesVec[k], Temp, 0);
+                if(NNonSMFermion>0)
+                {
                 for (std::size_t k = 0; k < NNonSMFermion; k++)
                     res += -2 * fermion(NonSMFermionMassVec[k], Temp, 0); //Non SM fermion contributions
+                }
             }
             else
             {
